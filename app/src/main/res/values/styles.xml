@@ -1,26 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Booming" parent="Base.Theme.Booming"/>
+    <style name="Theme.Axiom" parent="Base.Theme.Axiom"/>
 
-    <style name="Theme.Booming.Light" parent="Base.Theme.Booming.Light"/>
+    <style name="Theme.Axiom.Light" parent="Base.Theme.Axiom.Light"/>
 
-    <style name="Theme.Booming.Black" parent="Base.Theme.Booming.Black"/>
+    <style name="Theme.Axiom.Black" parent="Base.Theme.Axiom.Black"/>
 
-    <style name="Theme.Booming.FollowSystem" parent="Base.Theme.Booming.Adaptive"/>
+    <style name="Theme.Axiom.FollowSystem" parent="Base.Theme.Axiom.Adaptive"/>
 
-    <style name="Theme.Booming.SplashScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Axiom.SplashScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/splash</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="Widget.Booming.Expressive.Button" parent="Widget.Material3Expressive.Button">
+    <style name="Widget.Axiom.Expressive.Button" parent="Widget.Material3Expressive.Button">
         <item name="iconGravity">textStart</item>
     </style>
 
-    <style name="Widget.Booming.Expressive.Button.Tonal" parent="Widget.Material3Expressive.Button.TonalButton">
+    <style name="Widget.Axiom.Expressive.Button.Tonal" parent="Widget.Material3Expressive.Button.TonalButton">
         <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="Widget.Axiom.Expressive.Button.Icon.Filled" parent="Widget.Material3Expressive.Button">
+        <item name="backgroundTint">@color/md_theme_primary</item>
+        <item name="iconTint">@color/md_theme_onPrimary</item>
+        <item name="android:insetTop">2dp</item>
+        <item name="android:insetBottom">2dp</item>
+        <item name="android:insetLeft">2dp</item>
+        <item name="android:insetRight">2dp</item>
+    </style>
+
+    <style name="Widget.Axiom.Expressive.Button.Icon.Filled.Tonal" parent="Widget.Material3Expressive.Button.TonalButton">
+        <item name="backgroundTint">@color/md_theme_secondaryContainer</item>
+        <item name="iconTint">@color/md_theme_onSecondaryContainer</item>
+        <item name="android:insetTop">2dp</item>
+        <item name="android:insetBottom">2dp</item>
+        <item name="android:insetLeft">2dp</item>
+        <item name="android:insetRight">2dp</item>
+    </style>
+
+    <style name="Widget.Axiom.BottomNavigation" parent="Widget.Material3Expressive.BottomNavigationView">
+        <item name="itemIconTint">@color/bottom_nav_color</item>
+        <item name="itemTextColor">@color/bottom_nav_color</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.Axiom.BottomNav.ActiveIndicator</item>
+    </style>
+
+    <style name="Widget.Axiom.BottomNav.ActiveIndicator" parent="Widget.Material3Expressive.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@android:color/transparent</item>
     </style>
 
     <style name="HomeActionButton" parent="Widget.Material3Expressive.Button">

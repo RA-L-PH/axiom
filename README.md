@@ -1,23 +1,23 @@
 <div align="center">
 
-<img src="metadata/en-US/images/icon.png" width="160" height="160" alt="Booming Music icon">
+<img src="icon-logo\svgviewer-png-output-4.png" width="160" height="160" alt="Axiom icon">
 
-# 🎵 Booming Music
+# 🎵 Axiom
 
 ### Modern design. Pure sound. Fully yours.
 
-[![Latest Release](https://img.shields.io/github/v/release/mardous/BoomingMusic?style=for-the-badge&label=Release&logo=github)](https://github.com/mardous/BoomingMusic/releases/latest)
-[![F-Droid version](https://img.shields.io/f-droid/v/com.mardous.booming?style=for-the-badge&label=F-Droid&logo=fdroid)](https://f-droid.org/packages/com.mardous.booming/)
-[![Downloads](https://img.shields.io/github/downloads/mardous/BoomingMusic/total?style=for-the-badge&logo=github&label=Downloads)](https://github.com/mardous/BoomingMusic/releases)
-[![License: GPL v3](https://img.shields.io/github/license/mardous/BoomingMusic?style=for-the-badge&color=orange&label=License&logo=gnu)](LICENSE.txt)
+[![Latest Release](https://img.shields.io/github/v/release/rc/Axiom?style=for-the-badge&label=Release&logo=github)](https://github.com/rc/Axiom/releases/latest)
+[![F-Droid version](https://img.shields.io/f-droid/v/com.rc.axiom?style=for-the-badge&label=F-Droid&logo=fdroid)](https://f-droid.org/packages/com.rc.axiom/)
+[![Downloads](https://img.shields.io/github/downloads/rc/Axiom/total?style=for-the-badge&logo=github&label=Downloads)](https://github.com/rc/Axiom/releases)
+[![License: GPL v3](https://img.shields.io/github/license/rc/Axiom?style=for-the-badge&color=orange&label=License&logo=gnu)](LICENSE.txt)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor_Covenant-2.1-4baaaa.svg?style=for-the-badge&logo=contributorcovenant)](CODE_OF_CONDUCT.md)
-[![Telegram Channel](https://img.shields.io/badge/Telegram-Join_Chat-blue?style=for-the-badge&logo=telegram)](https://t.me/mardousdev)
+[![Telegram Channel](https://img.shields.io/badge/Telegram-Join_Chat-blue?style=for-the-badge&logo=telegram)](https://t.me/rcdev)
 
-<a href="https://github.com/mardous/BoomingMusic/releases"><img src="assets/badge-github.png" height="60" alt="GitHub Release"></a>
-<a href="https://f-droid.org/packages/com.mardous.booming/"><img src="assets/badge-fdroid.png" height="60" alt="F-Droid"></a>
-<a href="https://apt.izzysoft.de/packages/com.mardous.booming/"><img src="assets/badge-izzyondroid.png" height="60" alt="IzzyOnDroid"></a>
-<a href="https://www.openapk.net/boomingmusic/com.mardous.booming/"><img src="assets/badge-openapk.png" height="60" alt="OpenAPK"></a>
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/mardous/BoomingMusic/"><img src="assets/badge-obtainium.png" height="60" alt="Obtainium"></a>
+<a href="https://github.com/rc/Axiom/releases"><img src="assets/badge-github.png" height="60" alt="GitHub Release"></a>
+<a href="https://f-droid.org/packages/com.rc.axiom/"><img src="assets/badge-fdroid.png" height="60" alt="F-Droid"></a>
+<a href="https://apt.izzysoft.de/packages/com.rc.axiom/"><img src="assets/badge-izzyondroid.png" height="60" alt="IzzyOnDroid"></a>
+<a href="https://www.openapk.net/axiommusic/com.rc.axiom/"><img src="assets/badge-openapk.png" height="60" alt="OpenAPK"></a>
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/rc/Axiom/"><img src="assets/badge-obtainium.png" height="60" alt="Obtainium"></a>
 
 </div>
 
@@ -103,22 +103,22 @@
 
 ## 🔗 Useful Links
 
-- 🔐 **[Requested Permissions](https://github.com/mardous/BoomingMusic/wiki/Advanced-Info#-permissions)**  
+- 🔐 **[Requested Permissions](https://github.com/rc/Axiom/wiki/Advanced-Info#-permissions)**  
   What the app needs and why
 
-- 🚘 **[Android Auto Setup](https://github.com/mardous/BoomingMusic/wiki/Advanced-Info#-android-auto-setup)**  
+- 🚘 **[Android Auto Setup](https://github.com/rc/Axiom/wiki/Advanced-Info#-android-auto-setup)**  
   How to enable and troubleshoot
 
-- 🎧 **[Supported Formats](https://github.com/mardous/BoomingMusic/wiki/Advanced-Info#-supported-formats)**  
+- 🎧 **[Supported Formats](https://github.com/rc/Axiom/wiki/Advanced-Info#-supported-formats)**  
   Compatible audio formats
 
-- 💬 **[Community](https://github.com/mardous/BoomingMusic/wiki/Community)**  
+- 💬 **[Community](https://github.com/rc/Axiom/wiki/Community)**  
   Users and contributors
 
-- 🌐 **[Translations](https://hosted.weblate.org/projects/booming-music/)**  
+- 🌐 **[Translations](https://hosted.weblate.org/projects/axiom-music/)**  
   Help us translate Booming Music into your language
 
-- ❓ **[FAQ](https://github.com/mardous/BoomingMusic/wiki/FAQ)**  
+- ❓ **[FAQ](https://github.com/rc/Axiom/wiki/FAQ)**  
   Common questions
 
 ## 🤝 Contributing
@@ -132,9 +132,9 @@ You can also:
 - Submit pull requests
 - Suggest new ideas
 
-**Translations:** Managed on [Hosted Weblate](https://hosted.weblate.org/projects/booming-music/).
+**Translations:** Managed on [Hosted Weblate](https://hosted.weblate.org/projects/axiom-music/).
 
-[![Translation Status](https://hosted.weblate.org/widget/booming-music/horizontal-auto.svg)](https://hosted.weblate.org/projects/booming-music/)
+[![Translation Status](https://hosted.weblate.org/widget/axiom-music/horizontal-auto.svg)](https://hosted.weblate.org/projects/axiom-music/)
 
 ## 💖 Support Development
 

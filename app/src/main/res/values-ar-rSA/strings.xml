@@ -435,7 +435,7 @@
     <string name="profiles_exported_successfully">Profiles exported successfully.</string>
     <string name="import_profiles">Import profiles</string>
     <string name="select_profiles_to_import">Select profiles to import:</string>
-    <string name="select_a_file_containing_booming_eq_profiles">Select a file containing Booming Music EQ Profiles.</string>
+    <string name="select_a_file_containing_axiom_eq_profiles">Select a file containing axiom EQ Profiles.</string>
     <string name="imported_x_profiles">Imported %d profiles.</string>
     <string name="no_profile_imported">No profile imported.</string>
     <string name="import_autoeq_profile">Import AutoEq profile</string>
@@ -533,7 +533,7 @@
     <string name="faq">FAQ</string>
     <string name="licenses">التراخيص</string>
     <string name="author">المؤلف</string>
-    <string name="mardous_summary">Lead Developer</string>
+    <string name="rc_summary">Lead Developer</string>
     <string name="contributors">المساهمون</string>
     <string name="translators_title">المترجمون</string>
     <string name="translators_summary">شكراً لأولئك الذين يجعلون الموسيقى المزدهرة متاحة بعدة لغات.</string>

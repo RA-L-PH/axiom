@@ -52,13 +52,13 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Booming.FollowSystem"
+        android:theme="@style/Theme.Axiom"
         tools:ignore="UnusedAttribute">
 
         <activity
             android:name=".ui.screen.MainActivity"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Booming.SplashScreen"/>
+            android:theme="@style/Theme.Axiom.SplashScreen"/>
 
         <activity
             android:label="@string/action_tag_editor"
@@ -203,7 +203,7 @@
 
         <!-- Begin: App Widgets -->
         <receiver
-            android:name=".core.appwidgets.BoomingGlanceWidgetReceiver"
+            android:name=".core.appwidgets.AxiomGlanceWidgetReceiver"
             android:label="@string/app_widget_responsive"
             android:exported="false">
             <intent-filter>

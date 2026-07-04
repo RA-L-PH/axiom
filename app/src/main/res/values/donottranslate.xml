@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name" translatable="false">Booming Music</string>
+	<string name="app_name" translatable="false">axiom</string>
 
-	<string name="mardous" translatable="false">Christians Martínez A.</string>
+	<string name="rc" translatable="false">Ralph C</string>
 
     <string name="instrumental_identifiers" translatable="false">(Instrumental)</string>
 
