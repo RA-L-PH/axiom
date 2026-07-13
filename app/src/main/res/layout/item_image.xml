@@ -22,7 +22,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            app:shapeAppearanceOverlay="?shapeAppearanceCornerLarge"
+            app:shapeAppearanceOverlay="@style/SquareShapeAppearance"
+            app:strokeColor="#FFFFFF"
+            app:strokeWidth="1dp"
             tools:srcCompat="@tools:sample/backgrounds/scenic[16]"/>
 
     </FrameLayout>

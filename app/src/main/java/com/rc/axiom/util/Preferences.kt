@@ -97,10 +97,10 @@ object Preferences : KoinComponent {
     }
 
     val blackTheme: Boolean
-        get() = preferences.getBoolean(BLACK_THEME, true)
+        get() = true // Force pure black always on
 
     val isMaterialYouTheme: Boolean
-        get() = preferences.getBoolean(MATERIAL_YOU, false)
+        get() = false // Force Material You always off
 
     val isCustomFont: Boolean
         get() = preferences.getBoolean(USE_CUSTOM_FONT, true)
@@ -132,12 +132,7 @@ object Preferences : KoinComponent {
 
     @LabelVisibility
     val bottomTitlesMode: Int
-        get() = when (preferences.nullString(TAB_TITLES_MODE)) {
-            BottomTitlesMode.SELECTED -> NavigationBarView.LABEL_VISIBILITY_SELECTED
-            BottomTitlesMode.LABELED -> NavigationBarView.LABEL_VISIBILITY_LABELED
-            BottomTitlesMode.UNLABELED -> NavigationBarView.LABEL_VISIBILITY_UNLABELED
-            else -> NavigationBarView.LABEL_VISIBILITY_UNLABELED
-        }
+        get() = NavigationBarView.LABEL_VISIBILITY_UNLABELED // Force unlabelled always
 
     val holdTabToSearch: Boolean
         get() = preferences.getBoolean(HOLD_TAB_TO_SEARCH, true)

@@ -67,6 +67,11 @@ open class AlbumAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(itemLayoutRes, parent, false)
+        val lp = view.layoutParams as? ViewGroup.MarginLayoutParams
+        if (lp != null) {
+            lp.setMargins(0, 0, 0, 0)
+            view.layoutParams = lp
+        }
         return createViewHolder(view, viewType)
     }
 
@@ -77,6 +82,7 @@ open class AlbumAdapter(
         holder.menu?.isGone = isChecked
         holder.title?.text = getAlbumTitle(album)
         holder.text?.text = getAlbumText(holder, album)
+        
         // Check if imageContainer exists, so we can have a smooth transition without
         // CardView clipping, if it doesn't exist in current layout set transition name to image instead.
         if (holder.imageContainer != null) {
@@ -163,6 +169,13 @@ open class AlbumAdapter(
                 }
             })
             play?.setOnClickListener {
+                val albumSongs = with(SongSortMode.AlbumSongs) {
+                    album.songs.sorted()
+                }
+                getViewModel<PlayerViewModel>()
+                    ?.openQueue(albumSongs, shuffleMode = OpenShuffleMode.Off)
+            }
+            itemView.findViewById<View>(R.id.play_overlay)?.setOnClickListener {
                 val albumSongs = with(SongSortMode.AlbumSongs) {
                     album.songs.sorted()
                 }

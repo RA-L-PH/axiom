@@ -78,15 +78,34 @@ class TagEditorViewModel(
         if (target.hasContent) {
             val metadataReader = MetadataReader(target.first.uri, target.hasArtwork)
             if (metadataReader.hasMetadata) {
+                val title = metadataReader.first(MetadataReader.TITLE)
+                val album = metadataReader.first(MetadataReader.ALBUM)
+                val artist = metadataReader.merge(MetadataReader.ARTIST)
+                var genre = metadataReader.merge(MetadataReader.GENRE)
+
+                if (genre.isNullOrBlank() && !artist.isNullOrBlank()) {
+                    val audioDbService = org.koin.core.context.GlobalContext.get().get<com.rc.axiom.data.remote.audiodb.AudioDbService>()
+                    val fetchedGenre = if (!title.isNullOrBlank()) {
+                        audioDbService.getTrackDetails(artist, title)?.strGenre
+                    } else if (!album.isNullOrBlank()) {
+                        audioDbService.getAlbumDetails(artist, album)?.strGenre
+                    } else {
+                        audioDbService.getArtistDetails(artist)?.strGenre
+                    }
+                    if (!fetchedGenre.isNullOrBlank()) {
+                        genre = fetchedGenre
+                    }
+                }
+
                 val newValue = TagEditorResult(
-                    title = metadataReader.first(MetadataReader.TITLE),
-                    album = metadataReader.first(MetadataReader.ALBUM),
-                    artist = metadataReader.merge(MetadataReader.ARTIST),
+                    title = title,
+                    album = album,
+                    artist = artist,
                     albumArtist = metadataReader.first(MetadataReader.ALBUM_ARTIST),
                     composer = metadataReader.merge(MetadataReader.COMPOSER),
                     conductor = metadataReader.merge(MetadataReader.PRODUCER),
                     publisher = metadataReader.merge(MetadataReader.COPYRIGHT),
-                    genre = metadataReader.merge(MetadataReader.GENRE),
+                    genre = genre,
                     year = metadataReader.first(MetadataReader.YEAR),
                     trackNumber = metadataReader.value(MetadataReader.TRACK_NUMBER),
                     trackTotal = metadataReader.value(MetadataReader.TRACK_TOTAL),
@@ -123,6 +142,16 @@ class TagEditorViewModel(
     }
 
     fun resetArtistImage() = liveData(Dispatchers.IO) {
+        val artist = fetchArtist()
+        if (artist != Artist.empty) {
+            emit(customArtistImageManager.removeCustomImage(artist))
+        } else {
+            emit(false)
+        }
+    }
+
+    fun clearArtistInfo(name: String) = liveData(Dispatchers.IO) {
+        repository.clearArtistCache(name)
         val artist = fetchArtist()
         if (artist != Artist.empty) {
             emit(customArtistImageManager.removeCustomImage(artist))

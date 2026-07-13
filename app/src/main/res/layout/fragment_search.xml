@@ -38,6 +38,7 @@
                     android:hint="@string/search_hint"
                     android:paddingStart="8dp"
                     android:textAlignment="viewStart"
+                    android:fontFamily="@font/ndot57"
                     tools:ignore="Autofill,RtlSymmetry" />
 
                 <FrameLayout

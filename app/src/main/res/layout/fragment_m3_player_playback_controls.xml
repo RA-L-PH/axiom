@@ -43,6 +43,7 @@
             android:ellipsize="end"
             android:paddingHorizontal="16dp"
             android:textAppearance="?textAppearanceSubtitle2"
+            android:fontFamily="@font/letteramonoll"
             android:textColor="?android:attr/textColorSecondary"
             app:layout_constrainedWidth="true"
             tools:text="@tools:sample/full_names" />
@@ -99,6 +100,7 @@
         android:ellipsize="end"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="12sp"
+        android:fontFamily="@font/letteramonoll"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

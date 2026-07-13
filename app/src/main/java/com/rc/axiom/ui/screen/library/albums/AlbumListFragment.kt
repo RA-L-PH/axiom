@@ -55,6 +55,13 @@ class AlbumListFragment : AbsRecyclerViewCustomGridSizeFragment<AlbumAdapter, Gr
         libraryViewModel.getAlbums().observe(viewLifecycleOwner) { albums ->
             adapter?.dataSet = albums
         }
+        val miniPlayerHeight = libraryViewModel.getMiniPlayerMargin().value?.totalMargin ?: 0
+        recyclerView.setPadding(0, 0, 0, miniPlayerHeight)
+    }
+
+    override fun notifyLayoutResChanged(res: Int) {
+        val miniPlayerHeight = libraryViewModel.getMiniPlayerMargin().value?.totalMargin ?: 0
+        recyclerView.setPadding(0, 0, 0, miniPlayerHeight)
     }
 
     override fun onShuffleClicked() {

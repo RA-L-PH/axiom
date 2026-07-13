@@ -542,12 +542,12 @@ abstract class AbsSlidingMusicPanelActivity : AbsBaseActivity(),
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     }
                 }
-                miniPlayerFragment?.setupButtonStyle()
+                miniPlayerFragment?.setupImageStyle()
             }
 
-            ADAPTIVE_CONTROLS -> miniPlayerFragment?.setupButtonStyle()
-            ADD_EXTRA_CONTROLS -> miniPlayerFragment?.setupExtraControls()
-            SQUIGGLY_SEEK_BAR -> miniPlayerFragment?.setUpProgressStyle()
+            ADAPTIVE_CONTROLS -> { /* Removed */ }
+            ADD_EXTRA_CONTROLS -> { /* Removed: no extra controls in axiom miniplayer */ }
+            SQUIGGLY_SEEK_BAR -> { /* No longer used */ }
 
             CAROUSEL_EFFECT,
             NOW_PLAYING_SMALL_IMAGE,

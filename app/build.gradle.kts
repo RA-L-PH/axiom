@@ -71,9 +71,9 @@ sealed class Version(
 }
 
 val currentVersion: Version = Version.Beta(
-    versionMajor = 1,
-    versionMinor = 3,
-    versionPatch = 1,
+    versionMajor = 0,
+    versionMinor = 1,
+    versionPatch = 2,
     versionBuild = 2
 )
 val currentVersionCode = currentVersion.code
@@ -87,7 +87,7 @@ android {
         targetSdk = 36
 
         applicationId = namespace
-        versionCode = 1310102
+        versionCode = 120102
         versionName = currentVersion.name
         check(versionCode == currentVersionCode)
     }
@@ -230,10 +230,21 @@ androidComponents {
             localProperties?.getProperty("LASTFM_SECRET") ?: System.getenv("LASTFM_SECRET") ?: ""
         } else ""
 
+        val dotenv = Properties().apply {
+            val envFile = rootProject.file(".env")
+            if (envFile.exists()) {
+                envFile.inputStream().use { load(it) }
+            }
+        }
+        val spotifyClientId = dotenv.getProperty("SPOTIFY_CLIENT_ID") ?: System.getenv("SPOTIFY_CLIENT_ID") ?: ""
+        val spotifyClientSecret = dotenv.getProperty("SPOTIFY_CLIENT_SECRET") ?: System.getenv("SPOTIFY_CLIENT_SECRET") ?: ""
+
         variant.buildConfigFields?.putAll(
             mapOf(
                 "LASTFM_API_KEY" to BuildConfigField("String", "\"$lastFmKey\"", "LastFM API Key"),
-                "LASTFM_SECRET" to BuildConfigField("String", "\"$lastFmSecret\"", "LastFM Secret")
+                "LASTFM_SECRET" to BuildConfigField("String", "\"$lastFmSecret\"", "LastFM Secret"),
+                "SPOTIFY_CLIENT_ID" to BuildConfigField("String", "\"$spotifyClientId\"", "Spotify Client ID"),
+                "SPOTIFY_CLIENT_SECRET" to BuildConfigField("String", "\"$spotifyClientSecret\"", "Spotify Client Secret")
             )
         )
 

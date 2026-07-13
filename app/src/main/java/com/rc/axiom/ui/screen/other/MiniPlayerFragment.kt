@@ -19,17 +19,14 @@ package com.rc.axiom.ui.screen.other
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.style.ForegroundColorSpan
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import coil3.request.Disposable
 import com.rc.axiom.R
 import com.rc.axiom.coil.songImage
 import com.rc.axiom.core.model.player.ProgressState
-import com.rc.axiom.core.model.theme.NowPlayingButtonStyle
 import com.rc.axiom.databinding.FragmentMiniPlayerBinding
 import com.rc.axiom.extensions.isTablet
 import com.rc.axiom.extensions.launchAndRepeatWithViewLifecycle
@@ -37,7 +34,6 @@ import com.rc.axiom.extensions.media.displayArtistName
 import com.rc.axiom.extensions.resources.*
 import com.rc.axiom.ui.component.base.SkipButtonTouchHandler
 import com.rc.axiom.ui.component.base.SkipButtonTouchHandler.Companion.DIRECTION_NEXT
-import com.rc.axiom.ui.component.base.SkipButtonTouchHandler.Companion.DIRECTION_PREVIOUS
 import com.rc.axiom.ui.screen.player.PlayerViewModel
 import com.rc.axiom.util.Preferences
 import kotlinx.coroutines.flow.collectLatest
@@ -54,23 +50,13 @@ class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player),
     private var _binding: FragmentMiniPlayerBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var primaryColorSpan: ForegroundColorSpan
-    private lateinit var secondaryColorSpan: ForegroundColorSpan
-
-    private val buttonStyle: NowPlayingButtonStyle
-        get() = if (Preferences.adaptiveControls) {
-            Preferences.nowPlayingScreen.buttonStyle
-        } else {
-            NowPlayingButtonStyle.Normal
-        }
-
     private var disposable: Disposable? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMiniPlayerBinding.bind(view)
-        binding.progressBar.installWavyAnimatorCleanup()
+
         viewLifecycleOwner.launchAndRepeatWithViewLifecycle {
             playerViewModel.currentSongFlow.collect { currentSong ->
                 disposable = binding.image.songImage(currentSong)
@@ -87,72 +73,46 @@ class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player),
             ) { progress, duration -> ProgressState(progress, duration) }
                 .filter { progress -> progress.mayUpdateUI }
                 .collectLatest {
-                    binding.progressBar.max = it.total.toInt()
-                    binding.progressBar.setProgressCompat(it.progress.toInt(), true)
+                    binding.seekBar.max = it.total.toInt()
+                    binding.seekBar.progress = it.progress.toInt()
                 }
         }
         viewLifecycleOwner.launchAndRepeatWithViewLifecycle {
             playerViewModel.isPlayingFlow.collect { isPlaying ->
-                updatePlayPause(isPlaying, buttonStyle)
+                updatePlayPause(isPlaying)
             }
         }
-        primaryColorSpan = textColorPrimary().toForegroundColorSpan()
-        secondaryColorSpan = textColorSecondary().toForegroundColorSpan()
         setupImageStyle()
         setUpButtons()
-        setUpProgressStyle()
         view.setOnTouchListener { _, event ->
             Preferences.miniPlayerSwipeToSkip && flingPlayBackController.onTouchEvent(event)
         }
     }
 
     fun setupImageStyle() {
-        val cornerRadius = Preferences.getNowPlayingImageCornerRadius(requireContext())
-        binding.image.setCornerRadius((cornerRadius / 2).toFloat())
+        // Force sharp shape (no curved corners)
+        val sharpShape = com.google.android.material.shape.ShapeAppearanceModel.builder()
+            .setAllCornerSizes(0f)
+            .build()
+        binding.image.shapeAppearanceModel = sharpShape
+        binding.actionPlayPause.shapeAppearanceModel = sharpShape
+        binding.actionNext.shapeAppearanceModel = sharpShape
     }
 
     private fun setUpButtons() {
-        setupButtonStyle()
-        setupExtraControls()
         binding.actionNext.setOnTouchListener(SkipButtonTouchHandler(DIRECTION_NEXT, this))
-        binding.actionPrevious.setOnTouchListener(SkipButtonTouchHandler(DIRECTION_PREVIOUS, this))
         binding.actionPlayPause.setOnClickListener(this)
-    }
-
-    fun setUpProgressStyle() {
-        val isWavy = playerViewModel.isPlaying && Preferences.squigglySeekBar
-        binding.progressBar.setAnimatedWave(isWavy)
-        binding.progressBar.setWavy(isWavy)
-    }
-
-    fun setupButtonStyle() {
-        val buttonStyle = this.buttonStyle
-        binding.actionNext.setIconResource(buttonStyle.skipNext)
-        binding.actionPrevious.setIconResource(buttonStyle.skipPrevious)
-        updatePlayPause(playerViewModel.isPlaying, buttonStyle)
-    }
-
-    fun setupExtraControls() {
-        if (resources.isTablet) {
-            binding.actionNext.show()
-            binding.actionPrevious.show()
-        } else {
-            binding.actionNext.isVisible = Preferences.extraControls
-            binding.actionPrevious.isVisible = Preferences.extraControls
-        }
     }
 
     override fun onSkipButtonHold(direction: Int) {
         when (direction) {
             DIRECTION_NEXT -> playerViewModel.seekForward()
-            DIRECTION_PREVIOUS -> playerViewModel.seekBack()
         }
     }
 
     override fun onSkipButtonTap(direction: Int) {
         when (direction) {
             DIRECTION_NEXT -> playerViewModel.seekToNext()
-            DIRECTION_PREVIOUS -> playerViewModel.seekToPrevious()
         }
     }
 
@@ -168,13 +128,12 @@ class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player),
         _binding = null
     }
 
-    private fun updatePlayPause(isPlaying: Boolean, buttonStyle: NowPlayingButtonStyle) {
+    private fun updatePlayPause(isPlaying: Boolean) {
         if (isPlaying) {
-            binding.actionPlayPause.setIconResource(buttonStyle.pause)
+            binding.actionPlayPause.setIconResource(R.drawable.ic_pause_24dp)
         } else {
-            binding.actionPlayPause.setIconResource(buttonStyle.play)
+            binding.actionPlayPause.setIconResource(R.drawable.ic_play_24dp)
         }
-        setUpProgressStyle()
     }
 
     private var flingPlayBackController = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -182,9 +141,6 @@ class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player),
                 if (abs(velocityX) > abs(velocityY)) {
                     if (velocityX < 0) {
                         playerViewModel.seekToNext()
-                        return true
-                    } else if (velocityX > 0) {
-                        playerViewModel.seekToPrevious()
                         return true
                     }
                 }

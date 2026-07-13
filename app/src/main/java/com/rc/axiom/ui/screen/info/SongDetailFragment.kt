@@ -236,6 +236,12 @@ class SongDetailFragment : BottomSheetDialogFragment() {
                                     MetadataInfoSection(uiState.info, Modifier.fillMaxWidth())
                                 }
                             }
+                            val bio = uiState.info.biography
+                            if (!bio.isNullOrBlank()) {
+                                item {
+                                    BiographySection(song.artistName, bio, Modifier.fillMaxWidth())
+                                }
+                            }
                             item {
                                 PlayInfoSection(uiState.info, Modifier.fillMaxWidth())
                             }
@@ -470,6 +476,21 @@ class SongDetailFragment : BottomSheetDialogFragment() {
             ) {
                 content()
             }
+        }
+    }
+
+    @Composable
+    private fun BiographySection(artistName: String, biography: String, modifier: Modifier = Modifier) {
+        InfoSection(
+            title = stringResource(R.string.about_x_title, artistName),
+            modifier = modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = biography,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
         }
     }
 }

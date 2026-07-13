@@ -29,7 +29,7 @@ enum class NowPlayingAction(
     @StringRes val titleRes: Int
 ) {
     Lyrics(
-        iconRes = R.drawable.ic_lyrics_outline_24dp,
+        iconRes = R.drawable.ic_lyrics_outline_white,
         titleRes = R.string.action_show_lyrics
     ),
     LyricsEditor(

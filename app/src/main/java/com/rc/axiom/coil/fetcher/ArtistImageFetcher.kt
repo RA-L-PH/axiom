@@ -53,10 +53,14 @@ class ArtistImageFetcher(
             }
         }
 
-        if (!image.isNameUnknown && NetworkFeature.Images.Artists.isAvailable) {
+        if (!image.isNameUnknown && NetworkFeature.Images.Artists.isEnabled && NetworkFeature.isOnline(ignoreWifiSetting = true)) {
+            val artistObj = try { repository.artistById(image.id) } catch (e: Exception) { null }
+            val songTitles = artistObj?.songs?.map { it.title }?.distinct()?.take(5) ?: emptyList()
+            val albumTitles = artistObj?.sortedAlbums?.map { it.name }?.distinct()?.take(3) ?: emptyList()
+
             var pageIndex = 0
             var revisedResults = 0
-            var deezerArtist = repository.deezerArtist(image.name, MAX_RESULT_PER_PAGE, pageIndex)
+            var deezerArtist = repository.deezerArtist(image.name, MAX_RESULT_PER_PAGE, pageIndex, songTitles, albumTitles)
             val total = min(deezerArtist?.total ?: 0, MAX_RESULT_COUNT)
             while (deezerArtist != null && revisedResults < total) {
                 val (matched, imageUrl) = deezerArtist.getBestImage(image.name, imageSize)
@@ -71,7 +75,7 @@ class ArtistImageFetcher(
                 }
                 revisedResults += deezerArtist.result.size
                 if (revisedResults < total) {
-                    deezerArtist = repository.deezerArtist(image.name, min((total - revisedResults), MAX_RESULT_PER_PAGE), pageIndex++)
+                    deezerArtist = repository.deezerArtist(image.name, min((total - revisedResults), MAX_RESULT_PER_PAGE), pageIndex++, songTitles, albumTitles)
                 }
             }
         }

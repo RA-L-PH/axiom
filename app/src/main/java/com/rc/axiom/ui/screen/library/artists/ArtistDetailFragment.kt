@@ -59,6 +59,7 @@ import com.rc.axiom.extensions.navigation.playInfoArgs
 import com.rc.axiom.extensions.navigation.searchArgs
 import com.rc.axiom.extensions.plurals
 import com.rc.axiom.extensions.resources.removeHorizontalMarginIfRequired
+import com.rc.axiom.extensions.resources.setMarkdownText
 import com.rc.axiom.extensions.resources.setupStatusBarForeground
 import com.rc.axiom.extensions.resources.surfaceColor
 import com.rc.axiom.extensions.setSupportActionBar
@@ -70,9 +71,11 @@ import com.rc.axiom.ui.adapters.HeaderAdapter
 import com.rc.axiom.ui.adapters.HorizontalListAdapter
 import com.rc.axiom.ui.adapters.SectionHeaderAdapter
 import com.rc.axiom.ui.adapters.WikiAdapter
+import com.rc.axiom.ui.adapters.ArtistExtraInfoAdapter
 import com.rc.axiom.ui.adapters.album.SimpleAlbumAdapter
 import com.rc.axiom.ui.adapters.artist.ArtistAdapter
 import com.rc.axiom.ui.adapters.song.SimpleSongAdapter
+import com.rc.axiom.extensions.launchAndRepeatWithViewLifecycle
 import com.rc.axiom.ui.component.base.AbsMainActivityFragment
 import com.rc.axiom.ui.component.menu.onAlbumsMenu
 import com.rc.axiom.ui.component.menu.onArtistMenu
@@ -106,10 +109,14 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
     private lateinit var songAdapter: SimpleSongAdapter
     private lateinit var similarArtistAdapter: HorizontalListAdapter
     private lateinit var wikiAdapter: WikiAdapter
+    private lateinit var extraInfoAdapter: ArtistExtraInfoAdapter
     private lateinit var concatAdapter: ConcatAdapter
 
     private var lang: String? = null
     private var biography: String? = null
+
+    private enum class ArtistTab { Songs, Albums }
+    private var currentTab = ArtistTab.Songs
 
     private val isAlbumArtist: Boolean
         get() = !arguments.artistName.isNullOrEmpty()
@@ -132,8 +139,6 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
 
         view.applyHorizontalWindowInsets()
 
-        binding.appBarLayout.setupStatusBarForeground()
-
         postponeEnterTransition()
         detailViewModel.getArtistDetail().observe(viewLifecycleOwner) { result ->
             view.doOnPreDraw {
@@ -149,6 +154,12 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
         setupRecyclerView()
 
         detailViewModel.loadArtistDetail()
+
+        viewLifecycleOwner.launchAndRepeatWithViewLifecycle {
+            playerViewModel.currentSongFlow.collect { song ->
+                songAdapter.currentSongId = song.id
+            }
+        }
     }
 
     private fun getArtist() = detailViewModel.getArtist()
@@ -182,6 +193,25 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
             headerBinding.title.text = getArtist().displayName()
             headerBinding.subtitle.text = getArtist().artistInfo(requireContext())
 
+            val bio = biography
+            if (!bio.isNullOrBlank()) {
+                headerBinding.wikiCard.visibility = View.VISIBLE
+                headerBinding.wikiText.setMarkdownText(bio)
+                val toggleExpansion = {
+                    if (headerBinding.wikiText.maxLines == 4) {
+                        headerBinding.wikiText.maxLines = Integer.MAX_VALUE
+                        headerBinding.wikiChevron.setImageResource(R.drawable.ic_keyboard_arrow_up_24dp)
+                    } else {
+                        headerBinding.wikiText.maxLines = 4
+                        headerBinding.wikiChevron.setImageResource(R.drawable.ic_keyboard_arrow_down_24dp)
+                    }
+                }
+                headerBinding.wikiText.setOnClickListener { toggleExpansion() }
+                headerBinding.wikiChevron.setOnClickListener { toggleExpansion() }
+            } else {
+                headerBinding.wikiCard.visibility = View.GONE
+            }
+
             headerBinding.playAction.setOnClickListener {
                 playerViewModel.openQueue(getArtist().sortedSongs, shuffleMode = OpenShuffleMode.Off)
             }
@@ -189,6 +219,33 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
                 playerViewModel.openAndShuffleQueue(getArtist().sortedSongs)
             }
             headerBinding.searchAction?.setOnClickListener { goToSearch() }
+
+            headerBinding.tabContainer.visibility = View.VISIBLE
+
+            val songsBg = if (currentTab == ArtistTab.Songs) Color.parseColor("#D71921") else Color.TRANSPARENT
+            val albumsBg = if (currentTab == ArtistTab.Albums) Color.parseColor("#D71921") else Color.TRANSPARENT
+            val songsColor = if (currentTab == ArtistTab.Songs) Color.parseColor("#FFFFFF") else Color.parseColor("#888888")
+            val albumsColor = if (currentTab == ArtistTab.Albums) Color.parseColor("#FFFFFF") else Color.parseColor("#888888")
+
+            headerBinding.tabSongs.setBackgroundColor(songsBg)
+            headerBinding.tabAlbums.setBackgroundColor(albumsBg)
+            headerBinding.tabSongs.setTextColor(songsColor)
+            headerBinding.tabAlbums.setTextColor(albumsColor)
+
+            headerBinding.tabSongs.setOnClickListener {
+                if (currentTab != ArtistTab.Songs) {
+                    currentTab = ArtistTab.Songs
+                    updateConcatAdapter()
+                    headerAdapter.notifyDataSetChanged()
+                }
+            }
+            headerBinding.tabAlbums.setOnClickListener {
+                if (currentTab != ArtistTab.Albums) {
+                    currentTab = ArtistTab.Albums
+                    updateConcatAdapter()
+                    headerAdapter.notifyDataSetChanged()
+                }
+            }
         }
 
         // Grid albums
@@ -230,6 +287,7 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
 
         // Wiki
         wikiAdapter = WikiAdapter()
+        extraInfoAdapter = ArtistExtraInfoAdapter()
 
         val spanCount = defaultGridColumns()
         val layoutManager = GridLayoutManager(requireContext(), spanCount)
@@ -252,17 +310,19 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
         val adapters = mutableListOf<RecyclerView.Adapter<*>>()
         adapters.add(headerAdapter)
 
-        if (Preferences.horizontalArtistAlbums) {
-            adapters.add(albumHorizontalAdapter)
+        if (currentTab == ArtistTab.Albums) {
+            if (Preferences.horizontalArtistAlbums) {
+                adapters.add(albumHorizontalAdapter)
+            } else {
+                adapters.add(albumHeaderAdapter)
+                adapters.add(albumGridAdapter)
+            }
         } else {
-            adapters.add(albumHeaderAdapter)
-            adapters.add(albumGridAdapter)
+            adapters.add(songHeaderAdapter)
+            adapters.add(songAdapter)
         }
 
-        adapters.add(songHeaderAdapter)
-        adapters.add(songAdapter)
-        adapters.add(similarArtistAdapter)
-        adapters.add(wikiAdapter)
+        adapters.add(extraInfoAdapter)
 
         concatAdapter = ConcatAdapter(config, adapters)
         if (_binding != null) {
@@ -328,14 +388,36 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
     }
 
     private fun artistInfo(lastFmArtist: LastFmArtist?) {
-        if (lastFmArtist?.artist?.bio != null) {
-            val bioContent = lastFmArtist.artist.bio.content
-            if (bioContent != null && bioContent.trim().isNotEmpty()) {
+        if (lastFmArtist != null) {
+            val bioContent = lastFmArtist.artist?.bio?.content
+            if (!bioContent.isNullOrEmpty()) {
                 biography = bioContent
-                wikiAdapter.update(getString(R.string.about_x_title, getArtist().name), biography)
+                headerAdapter.notifyItemChanged(0)
             }
-        }
+            val extraTags = mutableListOf<String>()
+            if (!bioContent.isNullOrEmpty()) {
+                extraTags.add("SOURCE: WIKIPEDIA")
+            }
+            if (com.rc.axiom.data.model.network.NetworkFeature.Services.Spotify.isAvailable) {
+                extraTags.add("SOURCE: SPOTIFY")
+            }
+            if (com.rc.axiom.data.model.network.NetworkFeature.Services.MusicBrainz.isAvailable) {
+                extraTags.add("SOURCE: MUSICBRAINZ")
+            }
+            if (com.rc.axiom.data.model.network.NetworkFeature.Services.AudioDb.isAvailable) {
+                extraTags.add("SOURCE: AUDIODB")
+            }
 
+            extraInfoAdapter.update(
+                title = "ARTIST INFO",
+                debut = lastFmArtist.debutYear,
+                genre = lastFmArtist.genre,
+                style = lastFmArtist.style,
+                mood = lastFmArtist.mood,
+                country = lastFmArtist.country,
+                extraTags = extraTags
+            )
+        }
         // If the "lang" parameter is set and no biography is given, retry with default language
         if (biography == null && lang != null) {
             loadBiography(getArtist().name, null)

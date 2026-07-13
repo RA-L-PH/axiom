@@ -45,7 +45,7 @@ class ArtistDetailViewModel(
         lang: String?,
         cache: String?
     ): LiveData<LastFmArtist?> = liveData(Dispatchers.IO) {
-        if (NetworkFeature.Lastfm.Biographies.isAvailable) {
+        if (NetworkFeature.isOnline(ignoreWifiSetting = true)) {
             emit(repository.artistInfo(name, lang, cache))
         }
     }

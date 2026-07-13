@@ -7,6 +7,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.rc.axiom.data.local.MetadataReader
 import com.rc.axiom.data.local.repository.Repository
+import com.rc.axiom.data.local.repository.NetworkRepository
 import com.rc.axiom.data.mapper.toPlayCount
 import com.rc.axiom.data.model.Album
 import com.rc.axiom.data.model.Artist
@@ -28,7 +29,10 @@ import kotlinx.coroutines.launch
 import org.jaudiotagger.audio.AudioHeader
 import java.io.File
 
-class InfoViewModel(private val repository: Repository) : ViewModel() {
+class InfoViewModel(
+    private val repository: Repository,
+    private val networkRepository: NetworkRepository
+) : ViewModel() {
 
     private val _songInfoUiState = MutableStateFlow(
         SongInfoUiState(
@@ -85,19 +89,25 @@ class InfoViewModel(private val repository: Repository) : ViewModel() {
 
             val metadataReader = MetadataReader(song.uri)
             if (!metadataReader.hasMetadata) {
-                SongInfo(
-                    playCount = playCount,
-                    skipCount = skipCount,
-                    lastPlayedDate = lastPlayed,
-                    filePath = File(song.data).getPrettyAbsolutePath(),
-                    fileSize = song.size.asReadableFileSize(),
-                    trackLength = trackLength,
-                    dateModified = dateModified,
-                    title = song.title,
-                    albumYear = year,
-                    replayGain = replayGain
-                )
-            } else {
+            val artistName = song.artistName
+            val biography = if (!artistName.isNullOrEmpty() && artistName != "<unknown>") {
+                runCatching { networkRepository.artistInfo(artistName, null, null)?.artist?.bio?.content }.getOrNull()
+            } else null
+
+            SongInfo(
+                playCount = playCount,
+                skipCount = skipCount,
+                lastPlayedDate = lastPlayed,
+                filePath = File(song.data).getPrettyAbsolutePath(),
+                fileSize = song.size.asReadableFileSize(),
+                trackLength = trackLength,
+                dateModified = dateModified,
+                title = song.title,
+                albumYear = year,
+                replayGain = replayGain,
+                biography = biography
+            )
+        } else {
                 val file = File(song.data)
                 val filePath = file.getPrettyAbsolutePath()
                 val fileSize = file.getHumanReadableSize()
@@ -126,6 +136,11 @@ class InfoViewModel(private val repository: Repository) : ViewModel() {
                 val genre = metadataReader.merge(MetadataReader.GENRE)
                 val comment = metadataReader.value(MetadataReader.COMMENT)
 
+                val artistName = artist ?: song.artistName
+                val biography = if (!artistName.isNullOrEmpty() && artistName != "<unknown>") {
+                    runCatching { networkRepository.artistInfo(artistName, null, null)?.artist?.bio?.content }.getOrNull()
+                } else null
+
                 SongInfo(
                     playCount = playCount,
                     skipCount = skipCount,
@@ -149,7 +164,8 @@ class InfoViewModel(private val repository: Repository) : ViewModel() {
                     arranger = arranger,
                     genre = genre,
                     replayGain = replayGain,
-                    comment = comment
+                    comment = comment,
+                    biography = biography
                 )
             }
         }

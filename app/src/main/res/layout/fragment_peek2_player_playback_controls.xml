@@ -40,6 +40,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:textAppearance="?textAppearanceBody1"
+        android:fontFamily="@font/letteramonoll"
         android:textColor="?android:attr/textColorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,6 +69,7 @@
             android:singleLine="true"
             android:ellipsize="end"
             android:textAppearance="?textAppearanceBody2"
+            android:fontFamily="@font/letteramonoll"
             android:textSize="12sp"
             tools:text="@tools:sample/lorem" />
 

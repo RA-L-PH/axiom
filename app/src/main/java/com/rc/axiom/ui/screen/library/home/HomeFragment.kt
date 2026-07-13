@@ -140,7 +140,7 @@ class HomeFragment : AbsMainActivityFragment(R.layout.fragment_home),
             findNavController().navigate(R.id.nav_search)
         }
         val hexColor = String.format("#%06X", 0xFFFFFF and primaryColor())
-        val appName = "a<font color=\"#F93838\">x</font>i<font color=\"#F93838\">o</font>m".toHtml()
+        val appName = "<font size=\"32sp\">a<font color=\"#D71921\">x</font>i<font color=\"#D71921\">o</font>m<font color=\"#D71921\">.</font></font>".toHtml()
         binding.appBarLayout.title = appName
     }
 
@@ -215,7 +215,7 @@ class HomeFragment : AbsMainActivityFragment(R.layout.fragment_home),
             ContentType.RecentArtists -> ArtistAdapter(
                 activity = mainActivity,
                 dataSet = (suggestion.items as List<Artist>),
-                itemLayoutRes = R.layout.item_artist,
+                itemLayoutRes = R.layout.item_artist_home,
                 callback = this
             )
 
@@ -231,7 +231,7 @@ class HomeFragment : AbsMainActivityFragment(R.layout.fragment_home),
             ContentType.NotRecentlyPlayed -> SongAdapter(
                 activity = mainActivity,
                 dataSet = (suggestion.items as List<Song>),
-                itemLayoutRes = R.layout.item_image,
+                itemLayoutRes = R.layout.item_image_no_title,
                 callback = this
             )
 

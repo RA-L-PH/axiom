@@ -341,81 +341,118 @@ private fun AuthorSection(
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 16.dp, bottom = 8.dp)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            AboutContributorImage(
-                username = "ralph",
-                modifier = Modifier.size(88.dp)
-            )
+            // Left Column: Profile info
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
+                AboutContributorImage(
+                    username = "ralph",
+                    modifier = Modifier.size(72.dp)
+                )
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(8.dp))
 
-            Text(
-                text = stringResource(R.string.rc),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
+                Text(
+                    text = stringResource(R.string.rc),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
 
-            Text(
-                text = stringResource(R.string.rc_summary),
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
+                Spacer(Modifier.height(4.dp))
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .wrapContentSize()
-                .padding(8.dp)
-        ) {
-            if (!App.isPlayStoreBuild()) {
-                Button(
-                    onClick = onDonateClick,
-                    modifier = Modifier.wrapContentSize()
+                Text(
+                    text = stringResource(R.string.rc_summary),
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // Right Column: Connections list
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "CONNECTIONS",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onGitHubClick)
+                        .padding(vertical = 4.dp)
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_volunteer_activism_24dp),
-                        contentDescription = null
+                        painter = painterResource(R.drawable.ic_github_circle_24dp),
+                        contentDescription = "GitHub profile",
+                        modifier = Modifier.size(20.dp)
                     )
-                    Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                    Text(stringResource(R.string.support_my_work))
+                    Spacer(Modifier.width(8.dp))
+                    Text("GitHub", style = MaterialTheme.typography.bodyMedium)
                 }
-            }
 
-            IconButton(
-                onClick = onPortfolioClick,
-                modifier = Modifier.wrapContentSize()
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_language_24dp),
-                    contentDescription = "Portfolio"
-                )
-            }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onEmailClick)
+                        .padding(vertical = 4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_email_24dp),
+                        contentDescription = "Write an email",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Email", style = MaterialTheme.typography.bodyMedium)
+                }
 
-            IconButton(
-                onClick = onGitHubClick,
-                modifier = Modifier.wrapContentSize()
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_github_circle_24dp),
-                    contentDescription = "GitHub profile"
-                )
-            }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onPortfolioClick)
+                        .padding(vertical = 4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_language_24dp),
+                        contentDescription = "Portfolio website",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Portfolio", style = MaterialTheme.typography.bodyMedium)
+                }
 
-            IconButton(
-                onClick = onEmailClick,
-                modifier = Modifier.wrapContentSize()
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_email_24dp),
-                    contentDescription = "Write an email"
-                )
+                if (!App.isPlayStoreBuild()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onDonateClick)
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_volunteer_activism_24dp),
+                            contentDescription = "Donate",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("Donate", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
             }
         }
     }
@@ -515,18 +552,6 @@ private fun getAboutSections(
 
     return listOf(
         stringResource(R.string.author) to listOf(
-            AboutItemData(
-                icon = { AboutItemIcon(painterResource(R.drawable.ic_github_circle_24dp)) },
-                title = stringResource(R.string.portfolio),
-                summary = stringResource(R.string.portfolio_summary),
-                onClick = { context.openUrl("https://ra-l-ph.pages.dev") }
-            ),
-            AboutItemData(
-                icon = { AboutItemIcon(painterResource(R.drawable.ic_github_circle_24dp)) },
-                title = stringResource(R.string.axiom_github),
-                summary = stringResource(R.string.axiom_github_summary),
-                onClick = { context.openUrl(GITHUB_URL) }
-            ),
             AboutItemData(
                 icon = { AboutItemIcon(painterResource(R.drawable.ic_translate_24dp)) },
                 title = stringResource(R.string.translators_title),

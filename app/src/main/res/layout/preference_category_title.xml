@@ -12,6 +12,7 @@
         android:paddingTop="16dp"
         android:paddingEnd="16dp"
         android:textAppearance="?textAppearanceOverline"
+        android:fontFamily="@font/ndot57"
         android:textColor="?colorPrimary"
         tools:text="@tools:sample/full_names" />
 </LinearLayout>

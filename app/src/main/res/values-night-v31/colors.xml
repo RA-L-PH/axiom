@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="m3_accent_color">#FF1744</color>
+    <color name="m3_accent_color">#D71921</color>
     <color name="m3_selection_color">#FFDAD6</color>
 
-    <color name="splash_color_4">#FF1744</color>
+    <color name="splash_color_4">#D71921</color>
     <color name="splash_color_3">#D50000</color>
     <color name="splash_color_2">#B71C1C</color>
     <color name="splash_color_1">#000000</color>

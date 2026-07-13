@@ -41,7 +41,8 @@ data class SongInfo(
     val arranger: String? = null,
     val genre: String? = null,
     val replayGain: String? = null,
-    val comment: String? = null
+    val comment: String? = null,
+    val biography: String? = null
 ) {
     // True only when every optional metadata field is absent; gates the metadata section in the UI.
     // lyricist and arranger are included alongside composer/conductor/publisher for consistency:

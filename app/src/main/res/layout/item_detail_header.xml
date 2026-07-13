@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2026 Christians Martínez Alvarado
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -20,101 +21,295 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="@dimen/header_margin_horizontal"
-    android:paddingEnd="@dimen/header_margin_horizontal"
-    android:paddingTop="16dp">
+    android:background="#000000"
+    android:padding="0dp">
 
+    <!-- Edge-to-edge Artist Cover Image -->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="48dp"
         android:scaleType="centerCrop"
-        app:shapeAppearanceOverlay="?shapeAppearanceCornerExtraLarge"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.None"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/backgrounds/scenic[5]" />
 
+    <!-- Dark Gradient Overlay (bottom-left to top-right) -->
+    <View
+        android:id="@+id/gradientOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/gradient_bottom_left_to_top_right"
+        app:layout_constraintStart_toStartOf="@id/image"
+        app:layout_constraintEnd_toEndOf="@id/image"
+        app:layout_constraintTop_toTopOf="@id/image"
+        app:layout_constraintBottom_toBottomOf="@id/image" />
+
+    <!-- Artist Name (overlayed at the bottom-left of the image) -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="20dp"
         android:ellipsize="end"
-        android:textAlignment="center"
+        android:maxLines="2"
         android:textAppearance="?textAppearanceTitleLargeEmphasized"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/ndot57"
+        android:textSize="28sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/image"
+        app:layout_constraintBottom_toBottomOf="@+id/image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="@tools:sample/cities" />
 
+    <!-- Artist Metadata (Below the image area) -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/subtitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
         android:singleLine="true"
-        android:textAlignment="center"
         android:textAppearance="?textAppearanceTitleMedium"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constraintStart_toStartOf="@+id/title"
-        app:layout_constraintEnd_toEndOf="@+id/title"
+        android:textColor="#D71921"
+        android:fontFamily="@font/letteramonoll"
+        app:layout_constraintTop_toBottomOf="@+id/image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="@tools:sample/full_names" />
 
+    <!-- About/Biography Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/wikiCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#050505"
+        android:elevation="0dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="1.5dp"
+        app:cardPreventCornerOverlap="false"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.None"
+        style="@style/Widget.Material3.CardView.Outlined"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/subtitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/wikiTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:textAppearance="?textAppearanceTitleMedium"
+                android:textColor="#D71921"
+                android:fontFamily="@font/ndot57"
+                android:textStyle="bold"
+                android:text="ABOUT" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/wikiText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="4"
+                android:lineSpacingMultiplier="1.2"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/letteramonoll" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/wikiChevron"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_keyboard_arrow_down_24dp"
+                app:tint="#D71921"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Artist Description/Bio Summary (if visible) -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/description"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textAlignment="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:textAppearance="?textAppearanceSubtitle2"
-        android:textColor="?colorOnSurfaceVariant"
+        android:textColor="#B0B0B0"
         android:ellipsize="end"
         android:visibility="gone"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle"
+        app:layout_constraintTop_toBottomOf="@+id/wikiCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:maxLines="3"
         tools:text="@tools:sample/lorem/random" />
 
+    <!-- Action Row (Play, Shuffle, Search) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/playAction"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="16dp"
+        app:icon="@drawable/ic_play_24dp"
+        app:iconSize="28dp"
+        app:iconTint="#FFFFFF"
+        app:iconGravity="textStart"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        app:cornerRadius="0dp"
+        android:backgroundTint="#D71921"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="1.5dp"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toBottomOf="@+id/description"
+        app:layout_constraintBottom_toTopOf="@+id/tabContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/shuffleAction" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/shuffleAction"
-        style="?materialIconButtonFilledTonalStyle"
+        style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="12dp"
         android:contentDescription="@string/shuffle_action"
         app:icon="@drawable/ic_shuffle_24dp"
+        app:iconSize="24dp"
+        app:iconTint="#FFFFFF"
+        app:iconGravity="textStart"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        app:cornerRadius="0dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="1.5dp"
+        android:backgroundTint="#000000"
         app:layout_constraintTop_toTopOf="@+id/playAction"
         app:layout_constraintBottom_toBottomOf="@+id/playAction"
-        app:layout_constraintEnd_toStartOf="@+id/playAction"/>
-
-    <com.rc.axiom.ui.component.views.MorphicIconButton
-        android:id="@+id/playAction"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="16dp"
-        android:saveEnabled="false"
-        app:morphicIcon="@drawable/ic_play_24dp"
-        app:morphicShape="cookie_9"
-        app:layout_constraintTop_toBottomOf="@+id/description"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/playAction"
+        app:layout_constraintEnd_toStartOf="@+id/searchAction" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/searchAction"
-        style="?materialIconButtonFilledTonalStyle"
+        style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="16dp"
         android:contentDescription="@string/search_label"
         app:icon="@drawable/ic_search_24dp"
+        app:iconSize="24dp"
+        app:iconTint="#FFFFFF"
+        app:iconGravity="textStart"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        app:cornerRadius="0dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="1.5dp"
+        android:backgroundTint="#000000"
         app:layout_constraintTop_toTopOf="@+id/playAction"
         app:layout_constraintBottom_toBottomOf="@+id/playAction"
-        app:layout_constraintStart_toEndOf="@+id/playAction"/>
+        app:layout_constraintStart_toEndOf="@+id/shuffleAction"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/tabContainer"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        android:elevation="0dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="1.5dp"
+        app:cardPreventCornerOverlap="false"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.None"
+        style="@style/Widget.Material3.CardView.Outlined"
+        app:layout_constraintTop_toBottomOf="@+id/playAction"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:background="#000000">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tabSongs"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="SONGS"
+                android:textColor="#FFFFFF"
+                android:background="#D71921"
+                android:fontFamily="@font/ndot57"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <View
+                android:id="@+id/tabDivider"
+                android:layout_width="1.5dp"
+                android:layout_height="match_parent"
+                android:background="#FFFFFF" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tabAlbums"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="ALBUMS"
+                android:textColor="#888888"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/ndot57"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

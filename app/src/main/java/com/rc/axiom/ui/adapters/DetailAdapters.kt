@@ -31,6 +31,9 @@ import com.rc.axiom.databinding.ItemDetailSectionHeaderBinding
 import com.rc.axiom.databinding.ItemDetailWikiBinding
 import com.rc.axiom.extensions.resources.setMarkdownText
 import com.rc.axiom.extensions.resources.show
+import android.content.res.ColorStateList
+import android.graphics.Color
+import com.rc.axiom.R
 
 class HeaderAdapter(
     private val onBind: (ItemDetailHeaderBinding) -> Unit
@@ -128,11 +131,21 @@ class WikiAdapter : RecyclerView.Adapter<WikiAdapter.ViewHolder>() {
         if (content != null) {
             holder.binding.wiki.show()
             holder.binding.wiki.setMarkdownText(content!!)
-            holder.binding.wiki.setOnClickListener {
-                holder.binding.wiki.maxLines = (if (holder.binding.wiki.maxLines == 4) Integer.MAX_VALUE else 4)
+            holder.binding.wikiChevron.visibility = View.VISIBLE
+            val toggleExpansion = {
+                if (holder.binding.wiki.maxLines == 4) {
+                    holder.binding.wiki.maxLines = Integer.MAX_VALUE
+                    holder.binding.wikiChevron.text = "∧"
+                } else {
+                    holder.binding.wiki.maxLines = 4
+                    holder.binding.wikiChevron.text = "∨"
+                }
             }
+            holder.binding.wiki.setOnClickListener { toggleExpansion() }
+            holder.binding.wikiChevron.setOnClickListener { toggleExpansion() }
         } else {
             holder.binding.wiki.isVisible = false
+            holder.binding.wikiChevron.visibility = View.GONE
         }
     }
 
@@ -187,6 +200,66 @@ class HorizontalListAdapter(
     }
 
     override fun getItemCount(): Int = if (visible) 1 else 0
+
+    override fun getItemId(position: Int): Long = stableId
+}
+
+class ArtistExtraInfoAdapter : RecyclerView.Adapter<ArtistExtraInfoAdapter.ViewHolder>() {
+
+    class ViewHolder(val binding: com.rc.axiom.databinding.ItemDetailExtraInfoBinding) : RecyclerView.ViewHolder(binding.root)
+
+    private val stableId = View.generateViewId().toLong()
+    private val tags = mutableListOf<String>()
+    private var titleText: String = "ARTIST INFO"
+
+    init {
+        setHasStableIds(true)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun update(title: String = "ARTIST INFO", debut: String? = null, genre: String? = null, style: String? = null, mood: String? = null, country: String? = null, extraTags: List<String> = emptyList()) {
+        this.titleText = title
+        tags.clear()
+        if (!debut.isNullOrBlank()) tags.add("DEBUT: $debut")
+        if (!genre.isNullOrBlank()) tags.add("GENRE: $genre")
+        if (!style.isNullOrBlank()) tags.add("STYLE: $style")
+        if (!mood.isNullOrBlank()) tags.add("MOOD: $mood")
+        if (!country.isNullOrBlank()) tags.add("LOCATION: $country")
+        tags.addAll(extraTags)
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(com.rc.axiom.databinding.ItemDetailExtraInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.binding.extraTitle.text = titleText
+        holder.binding.chipGroup.removeAllViews()
+        val context = holder.binding.root.context
+        for (tag in tags) {
+            val chip = com.google.android.material.chip.Chip(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                text = tag
+                setTextColor(Color.WHITE)
+                chipBackgroundColor = ColorStateList.valueOf(Color.parseColor("#121212"))
+                chipStrokeColor = ColorStateList.valueOf(Color.parseColor("#444444"))
+                chipStrokeWidth = 2f
+                shapeAppearanceModel = shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes(0f)
+                    .build()
+                typeface = androidx.core.content.res.ResourcesCompat.getFont(context, R.font.letteramonoll)
+                isClickable = false
+                isFocusable = false
+            }
+            holder.binding.chipGroup.addView(chip)
+        }
+    }
+
+    override fun getItemCount(): Int = if (tags.isNotEmpty()) 1 else 0
 
     override fun getItemId(position: Int): Long = stableId
 }

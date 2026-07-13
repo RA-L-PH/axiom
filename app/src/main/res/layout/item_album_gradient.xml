@@ -21,8 +21,10 @@
     style="?materialCardViewFilledStyle"
     android:layout_width="260dp"
     android:layout_height="140dp"
-    android:layout_margin="6dp"
-    app:cardCornerRadius="10dp">
+    android:layout_margin="2dp"
+    app:cardCornerRadius="0dp"
+    app:strokeColor="#FFFFFF"
+    app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -51,6 +53,15 @@
             app:layout_constraintStart_toStartOf="@+id/image"
             app:layout_constraintEnd_toEndOf="@+id/image" />
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/slate_diagonal_gradient"
+            app:layout_constraintTop_toTopOf="@+id/image"
+            app:layout_constraintBottom_toBottomOf="@+id/image"
+            app:layout_constraintStart_toStartOf="@+id/image"
+            app:layout_constraintEnd_toEndOf="@+id/image" />
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title"
             android:layout_width="0dp"
@@ -59,6 +70,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:textAppearance="?textAppearanceBodyMedium"
+            android:fontFamily="@font/ndot57"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             app:layout_constrainedWidth="true"
@@ -77,6 +89,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textAppearance="?textAppearanceBodySmall"
+            android:fontFamily="@font/letteramonoll"
             android:textColor="@android:color/white"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"

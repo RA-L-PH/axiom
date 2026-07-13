@@ -50,6 +50,10 @@ import com.rc.axiom.data.local.repository.SongRepository
 import com.rc.axiom.data.local.repository.SpecialRepository
 import com.rc.axiom.data.model.Genre
 import com.rc.axiom.data.remote.deezer.DeezerService
+import com.rc.axiom.data.remote.musicbrainz.MusicBrainzService
+import com.rc.axiom.data.remote.wikipedia.WikipediaService
+import com.rc.axiom.data.remote.spotify.SpotifyService
+import com.rc.axiom.data.remote.audiodb.AudioDbService
 import com.rc.axiom.data.remote.github.GitHubService
 import com.rc.axiom.data.remote.jsonHttpClient
 import com.rc.axiom.data.remote.lastfm.LastFmService
@@ -95,7 +99,16 @@ val networkModule = module {
         DeezerService(client = get())
     }
     single {
-        LastFmService(client = get())
+        MusicBrainzService(client = get())
+    }
+    single {
+        WikipediaService(client = get())
+    }
+    single {
+        SpotifyService(client = get(), preferences = get())
+    }
+    single {
+        AudioDbService(client = get())
     }
     single {
         ListenBrainzService(client = get())
@@ -263,9 +276,12 @@ private val dataModule = module {
         NetworkRepositoryImpl(
             context = androidContext(),
             preferences = get(),
-            lastFmService = get(),
             listenBrainzService = get(),
-            deezerService = get()
+            deezerService = get(),
+            musicBrainzService = get(),
+            wikipediaService = get(),
+            spotifyService = get(),
+            audioDbService = get()
         )
     } bind NetworkRepository::class
 }
@@ -345,7 +361,7 @@ private val viewModule = module {
     }
 
     viewModel {
-        InfoViewModel(repository = get())
+        InfoViewModel(repository = get(), networkRepository = get())
     }
 
     viewModel {

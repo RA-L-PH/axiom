@@ -59,6 +59,7 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textAppearance="?textAppearanceSubtitle2"
+                android:fontFamily="@font/letteramonoll"
                 android:textColor="?android:attr/textColorSecondary"
                 app:layout_constraintBottom_toTopOf="@+id/playbackControlsContainer"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -98,6 +99,7 @@
         android:singleLine="true"
         android:ellipsize="end"
         android:textAppearance="?textAppearanceBodySmall"
+        android:fontFamily="@font/letteramonoll"
         android:textColor="?android:attr/textColorSecondary"
         tools:text="@tools:sample/lorem/random" />
 

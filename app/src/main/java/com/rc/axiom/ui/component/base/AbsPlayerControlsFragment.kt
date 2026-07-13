@@ -274,18 +274,22 @@ abstract class AbsPlayerControlsFragment(@LayoutRes layoutRes: Int) : Fragment(l
         }
         repeatButton?.let {
             it.setIconResource(iconResource)
-            it.applyColor(
-                getPlaybackControlsColor(repeatMode != Player.REPEAT_MODE_OFF),
-                isIconButton = true
-            )
+            val color = if (repeatMode != Player.REPEAT_MODE_OFF) {
+                0xFFD71921.toInt()
+            } else {
+                lastDisabledPlaybackControlsColor
+            }
+            it.applyColor(color, isIconButton = true)
         }
     }
 
     open fun onUpdateShuffleMode(shuffleModeEnabled: Boolean) {
-        shuffleButton?.applyColor(
-            getPlaybackControlsColor(shuffleModeEnabled),
-            isIconButton = true
-        )
+        val color = if (shuffleModeEnabled) {
+            0xFFD71921.toInt()
+        } else {
+            lastDisabledPlaybackControlsColor
+        }
+        shuffleButton?.applyColor(color, isIconButton = true)
     }
 
     fun setMarquee(vararg textView: TextView?, marquee: Boolean) {

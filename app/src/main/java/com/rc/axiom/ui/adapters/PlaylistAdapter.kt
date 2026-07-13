@@ -116,6 +116,9 @@ class PlaylistAdapter(
             play?.setOnClickListener {
                 getViewModel<PlayerViewModel>()?.openPlaylist(playlist.playlistEntity)
             }
+            itemView.findViewById<View>(R.id.play_overlay)?.setOnClickListener {
+                getViewModel<PlayerViewModel>()?.openPlaylist(playlist.playlistEntity)
+            }
         }
 
         private val playlist: PlaylistWithSongs

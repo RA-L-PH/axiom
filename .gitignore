@@ -80,3 +80,5 @@ local.properties
 
 get_weblate_translators.py
 revamp
+
+.env

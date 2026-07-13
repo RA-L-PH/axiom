@@ -42,9 +42,18 @@ private fun provideDefaultCache(context: Context): Cache? {
 private fun headerInterceptor(context: Context): Interceptor {
     return Interceptor {
         val original = it.request()
-        val request = original.newBuilder()
-            .header("LastFmUser-Agent", context.packageName)
-            .addHeader("Content-Type", "application/json; charset=utf-8")
+        val builder = original.newBuilder()
+        
+        if (original.header("User-Agent").isNullOrEmpty()) {
+            builder.header("User-Agent", "Axiom/0.1.2 (contact@rc-axiom.com)")
+        }
+        builder.header("LastFmUser-Agent", context.packageName)
+        
+        if (original.header("Content-Type").isNullOrEmpty() && original.body != null) {
+            builder.header("Content-Type", "application/json; charset=utf-8")
+        }
+        
+        val request = builder
             .method(original.method, original.body)
             .build()
         it.proceed(request)

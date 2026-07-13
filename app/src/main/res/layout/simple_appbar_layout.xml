@@ -6,4 +6,5 @@
     android:layout_height="wrap_content"
     app:layout_scrollFlags="scroll|enterAlways"
     app:navigationIcon="@drawable/ic_search_24dp"
-    app:titleCentered="true" />
+    app:titleCentered="true"
+    app:titleTextAppearance="@style/TextAppearance.Axiom.Toolbar.Title" />

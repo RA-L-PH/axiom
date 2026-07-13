@@ -61,6 +61,14 @@ sealed class NetworkFeature(
             get() = boolResource(R.bool.enable_lastfm_integration) && super.isEnabled
     }
 
+    sealed class Services(preferenceKey: String, isOnByDefault: Boolean) :
+        NetworkFeature(preferenceKey, isOnByDefault) {
+        object Spotify : Services(SPOTIFY_ENABLED_KEY, true)
+        object Wikipedia : Services(WIKIPEDIA_ENABLED_KEY, true)
+        object MusicBrainz : Services(MUSICBRAINZ_ENABLED_KEY, true)
+        object AudioDb : Services(AUDIODB_ENABLED_KEY, true)
+    }
+
     sealed class ListenBrainz(preferenceKey: String, isOnByDefault: Boolean) :
         NetworkFeature(preferenceKey, isOnByDefault) {
         object Scrobbling : ListenBrainz(LISTENBRAINZ_SCROBBLING_ENABLED_KEY, false)
@@ -105,15 +113,20 @@ sealed class NetworkFeature(
         const val LISTENBRAINZ_SCROBBLING_ENABLED_KEY = "listenbrainz_scrobbling_enabled"
         const val LISTENBRAINZ_NOW_PLAYING_ENABLED_KEY = "listenbrainz_now_playing_enabled"
         const val UPDATE_SEARCH_MODE_KEY = "update_search_mode"
+        const val SPOTIFY_ENABLED_KEY = "spotify_enabled"
+        const val WIKIPEDIA_ENABLED_KEY = "wikipedia_enabled"
+        const val MUSICBRAINZ_ENABLED_KEY = "musicbrainz_enabled"
+        const val AUDIODB_ENABLED_KEY = "audiodb_enabled"
 
         fun isOnline(ignoreWifiSetting: Boolean = false): Boolean {
             val context = get<Context>()
             val cm = context.getSystemService<ConnectivityManager>() ?: return false
             val requireWifi = !ignoreWifiSetting && get<SharedPreferences>()
-                .getBoolean(ONLY_WIFI_NETWORK_KEY, true)
+                .getBoolean(ONLY_WIFI_NETWORK_KEY, false)
             val nc = cm.getNetworkCapabilities(cm.activeNetwork)
             if (nc != null) {
                 return nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        nc.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
                         (nc.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) && !requireWifi)
             }
             return false

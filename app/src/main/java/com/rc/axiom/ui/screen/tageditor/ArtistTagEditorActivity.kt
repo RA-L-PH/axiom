@@ -65,6 +65,10 @@ class ArtistTagEditorActivity : AbsTagEditorActivity() {
             artistBinding.albumArtist.setText(it.albumArtist)
             artistBinding.genre.setText(it.genre)
             artistBinding.discTotal.setText(it.discTotal)
+            artistBinding.composer.setText(it.composer)
+            artistBinding.conductor.setText(it.conductor)
+            artistBinding.publisher.setText(it.publisher)
+            artistBinding.comment.setText(it.comment)
         }
         viewModel.loadContent()
         loadCurrentArtistImage()
@@ -89,7 +93,8 @@ class ArtistTagEditorActivity : AbsTagEditorActivity() {
         val items = arrayOf(
             getString(R.string.set_artist_image),
             getString(R.string.web_search),
-            getString(R.string.reset_artist_image)
+            getString(R.string.reset_artist_image),
+            "Clear & Remove Artist Info"
         )
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.update_image)
@@ -98,9 +103,24 @@ class ArtistTagEditorActivity : AbsTagEditorActivity() {
                     0 -> startImagePicker()
                     1 -> searchOnlineImage()
                     2 -> deleteImage()
+                    3 -> clearArtistInfoAndFields()
                 }
             }
             .show()
+    }
+
+    private fun clearArtistInfoAndFields() {
+        val name = artistName ?: return
+        viewModel.clearArtistInfo(name).observe(this) {
+            loadCurrentArtistImage()
+        }
+        artistBinding.genre.setText("")
+        artistBinding.composer.setText("")
+        artistBinding.conductor.setText("")
+        artistBinding.publisher.setText("")
+        artistBinding.comment.setText("")
+        artistBinding.discTotal.setText("")
+        setImageBitmap(null)
     }
 
     override fun downloadOnlineImage() {}
@@ -155,5 +175,9 @@ class ArtistTagEditorActivity : AbsTagEditorActivity() {
             put(MetadataReader.ALBUM_ARTIST, albumArtist)
             put(MetadataReader.GENRE, artistBinding.genre.text?.toString())
             put(MetadataReader.DISC_TOTAL, artistBinding.discTotal.text?.toString())
+            put(MetadataReader.COMPOSER, artistBinding.composer.text?.toString())
+            put(MetadataReader.PRODUCER, artistBinding.conductor.text?.toString())
+            put(MetadataReader.COPYRIGHT, artistBinding.publisher.text?.toString())
+            put(MetadataReader.COMMENT, artistBinding.comment.text?.toString())
         }
 }

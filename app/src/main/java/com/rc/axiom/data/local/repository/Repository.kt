@@ -143,10 +143,11 @@ interface Repository {
     suspend fun scrobble(service: ScrobblingService, song: Song, timestamp: Long): ScrobblingResult
     suspend fun updateNowPlaying(service: ScrobblingService, song: Song): ScrobblingResult
     suspend fun deezerTrack(artist: String, title: String): DeezerTrack?
-    suspend fun deezerArtist(name: String, limit: Int, index: Int): DeezerArtist?
+    suspend fun deezerArtist(name: String, limit: Int, index: Int, songTitles: List<String> = emptyList(), albumTitles: List<String> = emptyList()): DeezerArtist?
     suspend fun deezerAlbum(artist: String, name: String): DeezerAlbum?
     suspend fun artistInfo(name: String, lang: String?, cache: String?): LastFmArtist?
     suspend fun albumInfo(artist: String, album: String, lang: String?): LastFmAlbum?
+    fun clearArtistCache(name: String)
 }
 
 class RealRepository(
@@ -450,16 +451,22 @@ class RealRepository(
     override suspend fun deezerTrack(artist: String, title: String) =
         networkRepository.deezerTrack(artist, title)
 
-    override suspend fun deezerArtist(name: String, limit: Int, index: Int) =
-        networkRepository.deezerArtist(name, limit, index)
+    override suspend fun deezerArtist(name: String, limit: Int, index: Int, songTitles: List<String>, albumTitles: List<String>) =
+        networkRepository.deezerArtist(name, limit, index, songTitles, albumTitles)
 
     override suspend fun deezerAlbum(artist: String, name: String) =
         networkRepository.deezerAlbum(artist, name)
 
-    override suspend fun artistInfo(name: String, lang: String?, cache: String?) =
-        networkRepository.artistInfo(name, lang, cache)
+    override suspend fun artistInfo(name: String, lang: String?, cache: String?): LastFmArtist? {
+        val artist = try { albumArtistByName(name) } catch (e: Exception) { null }
+        val songTitles = artist?.songs?.map { it.title }?.distinct()?.take(5) ?: emptyList()
+        val albumTitles = artist?.sortedAlbums?.map { it.name }?.distinct()?.take(3) ?: emptyList()
+        return networkRepository.artistInfo(name, lang, cache, songTitles, albumTitles)
+    }
 
     override suspend fun albumInfo(artist: String, album: String, lang: String?) =
         networkRepository.albumInfo(artist, album, lang)
 
+    override fun clearArtistCache(name: String) =
+        networkRepository.clearArtistCache(name)
 }

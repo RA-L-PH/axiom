@@ -80,7 +80,7 @@ abstract class AbsRecyclerViewCustomGridSizeFragment<Adt : RecyclerView.Adapter<
     protected val isLandscape: Boolean
         get() = resources.isLandscape
 
-    protected fun notifyLayoutResChanged(@LayoutRes res: Int) {
+    protected open fun notifyLayoutResChanged(@LayoutRes res: Int) {
         currentLayoutRes = res
         applyRecyclerViewPaddingForLayoutRes(recyclerView, currentLayoutRes)
     }

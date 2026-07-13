@@ -62,6 +62,13 @@
         <item name="materialIconButtonFilledTonalStyle">@style/Widget.Axiom.Expressive.Button.Icon.Filled.Tonal</item>
         <item name="bottomNavigationStyle">@style/Widget.Axiom.BottomNavigation</item>
         <item name="homeAsUpIndicator">@drawable/ic_back_24dp</item>
+        <item name="toolbarStyle">@style/Widget.Axiom.Toolbar</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Widget.Axiom.CollapsingToolbar</item>
+        <item name="shapeAppearanceCornerExtraSmall">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerSmall">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerMedium">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerLarge">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerExtraLarge">@style/SquareShapeAppearance</item>
     </style>
 
     <style name="Base.Theme.Axiom.Light" parent="Theme.Material3Expressive.Light.NoActionBar">
@@ -123,6 +130,13 @@
         <item name="materialIconButtonFilledTonalStyle">@style/Widget.Axiom.Expressive.Button.Icon.Filled.Tonal</item>
         <item name="bottomNavigationStyle">@style/Widget.Axiom.BottomNavigation</item>
         <item name="homeAsUpIndicator">@drawable/ic_back_24dp</item>
+        <item name="toolbarStyle">@style/Widget.Axiom.Toolbar</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Widget.Axiom.CollapsingToolbar</item>
+        <item name="shapeAppearanceCornerExtraSmall">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerSmall">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerMedium">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerLarge">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerExtraLarge">@style/SquareShapeAppearance</item>
     </style>
 
     <style name="Base.Theme.Axiom.Adaptive" parent="Theme.Material3Expressive.DayNight.NoActionBar">
@@ -184,6 +198,13 @@
         <item name="materialIconButtonFilledTonalStyle">@style/Widget.Axiom.Expressive.Button.Icon.Filled.Tonal</item>
         <item name="bottomNavigationStyle">@style/Widget.Axiom.BottomNavigation</item>
         <item name="homeAsUpIndicator">@drawable/ic_back_24dp</item>
+        <item name="toolbarStyle">@style/Widget.Axiom.Toolbar</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Widget.Axiom.CollapsingToolbar</item>
+        <item name="shapeAppearanceCornerExtraSmall">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerSmall">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerMedium">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerLarge">@style/SquareShapeAppearance</item>
+        <item name="shapeAppearanceCornerExtraLarge">@style/SquareShapeAppearance</item>
     </style>
 
     <style name="Base.Theme.Axiom.Black">
@@ -221,6 +242,27 @@
     <style name="CustomFontThemeOverlay">
         <item name="fontFamily">@font/ndot57</item>
         <item name="android:fontFamily">@font/ndot57</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Axiom.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Axiom.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Axiom.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Axiom.BodyMedium</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Axiom.BodySmall</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Axiom.BodySmall</item>
+    </style>
+
+    <style name="TextAppearance.Axiom.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="fontFamily">@font/letteramonoll</item>
+        <item name="android:fontFamily">@font/letteramonoll</item>
+    </style>
+
+    <style name="TextAppearance.Axiom.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/letteramonoll</item>
+        <item name="android:fontFamily">@font/letteramonoll</item>
+    </style>
+
+    <style name="TextAppearance.Axiom.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="fontFamily">@font/letteramonoll</item>
+        <item name="android:fontFamily">@font/letteramonoll</item>
     </style>
 
     <style name="CarTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -238,6 +280,25 @@
              - floating action button background (Play/Pause in media apps)
          -->
         <item name="colorSecondary">#2D8CEF</item>
+    </style>
+
+    <style name="Widget.Axiom.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="titleTextAppearance">@style/TextAppearance.Axiom.Toolbar.Title</item>
+    </style>
+
+    <style name="TextAppearance.Axiom.Toolbar.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/ndot57</item>
+        <item name="android:fontFamily">@font/ndot57</item>
+    </style>
+
+    <style name="Widget.Axiom.CollapsingToolbar" parent="Widget.Material3.CollapsingToolbar">
+        <item name="expandedTitleTextAppearance">@style/TextAppearance.Axiom.CollapsingToolbar.Expanded</item>
+        <item name="collapsedTitleTextAppearance">@style/TextAppearance.Axiom.Toolbar.Title</item>
+    </style>
+
+    <style name="TextAppearance.Axiom.CollapsingToolbar.Expanded" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/ndot57</item>
+        <item name="android:fontFamily">@font/ndot57</item>
     </style>
 
 </resources>

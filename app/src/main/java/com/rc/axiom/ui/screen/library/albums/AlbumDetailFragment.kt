@@ -68,6 +68,7 @@ import com.rc.axiom.ui.adapters.HeaderAdapter
 import com.rc.axiom.ui.adapters.HorizontalListAdapter
 import com.rc.axiom.ui.adapters.SectionHeaderAdapter
 import com.rc.axiom.ui.adapters.WikiAdapter
+import com.rc.axiom.ui.adapters.ArtistExtraInfoAdapter
 import com.rc.axiom.ui.adapters.album.AlbumAdapter
 import com.rc.axiom.ui.adapters.song.SimpleSongAdapter
 import com.rc.axiom.ui.component.base.AbsMainActivityFragment
@@ -100,6 +101,7 @@ class AlbumDetailFragment : AbsMainActivityFragment(R.layout.fragment_album_deta
     private lateinit var simpleSongAdapter: SimpleSongAdapter
     private lateinit var moreAlbumsAdapter: HorizontalListAdapter
     private lateinit var wikiAdapter: WikiAdapter
+    private lateinit var extraInfoAdapter: ArtistExtraInfoAdapter
     private lateinit var concatAdapter: ConcatAdapter
 
     private var albumArtistExists = false
@@ -123,8 +125,6 @@ class AlbumDetailFragment : AbsMainActivityFragment(R.layout.fragment_album_deta
         materialSharedAxis(view, prepareTransition = false)
 
         view.applyHorizontalWindowInsets()
-
-        binding.appBarLayout.setupStatusBarForeground()
 
         postponeEnterTransition()
         detailViewModel.getAlbumDetail().observe(viewLifecycleOwner) { album ->
@@ -183,6 +183,7 @@ class AlbumDetailFragment : AbsMainActivityFragment(R.layout.fragment_album_deta
                 playerViewModel.openAndShuffleQueue(getAlbum().songs)
             }
             headerBinding.searchAction?.setOnClickListener { goToSearch() }
+            headerBinding.tabContainer.visibility = View.GONE
         }
 
         songHeaderAdapter = SectionHeaderAdapter(getString(R.string.songs_label)) {
@@ -200,6 +201,7 @@ class AlbumDetailFragment : AbsMainActivityFragment(R.layout.fragment_album_deta
         }
 
         wikiAdapter = WikiAdapter()
+        extraInfoAdapter = ArtistExtraInfoAdapter()
 
         updateConcatAdapter()
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -211,7 +213,8 @@ class AlbumDetailFragment : AbsMainActivityFragment(R.layout.fragment_album_deta
             songHeaderAdapter,
             simpleSongAdapter,
             moreAlbumsAdapter,
-            wikiAdapter
+            wikiAdapter,
+            extraInfoAdapter
         )
         binding.recyclerView.adapter = concatAdapter
     }
@@ -236,6 +239,25 @@ class AlbumDetailFragment : AbsMainActivityFragment(R.layout.fragment_album_deta
         }
 
         headerAdapter.notifyItemChanged(0)
+
+        val firstSong = album.safeGetFirstSong()
+        val genre = firstSong.genreName?.takeIf { it.isNotBlank() }
+        val durationStr = album.duration.asReadableDuration(readableFormat = true)
+        val extraTags = mutableListOf<String>()
+        extraTags.add("TRACKS: ${album.songCount}")
+        extraTags.add("DURATION: $durationStr")
+        if (com.rc.axiom.data.model.network.NetworkFeature.Services.Spotify.isAvailable) {
+            extraTags.add("SOURCE: SPOTIFY")
+        }
+        if (com.rc.axiom.data.model.network.NetworkFeature.Services.Wikipedia.isAvailable) {
+            extraTags.add("SOURCE: WIKIPEDIA")
+        }
+        extraInfoAdapter.update(
+            title = "ALBUM INFO",
+            debut = album.year.takeIf { it > 0 }?.toString(),
+            genre = genre,
+            extraTags = extraTags
+        )
 
         val songText = plurals(R.plurals.songs, album.songCount)
         songHeaderAdapter.updateTitle(buildInfoString(

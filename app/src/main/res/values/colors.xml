@@ -21,22 +21,22 @@
 
     <color name="ic_launcher_background">#000000</color>
 
-    <color name="app_shortcut_default_foreground">#FF1744</color>
+    <color name="app_shortcut_default_foreground">#D71921</color>
     <color name="app_shortcut_default_background">@color/ic_launcher_background</color>
 
-    <color name="md_theme_primary">#FF1744</color>
+    <color name="md_theme_primary">#D71921</color>
     <color name="md_theme_onPrimary">#FFFFFF</color>
     <color name="md_theme_primaryContainer">#5C0A1E</color>
     <color name="md_theme_onPrimaryContainer">#FFDAD6</color>
-    <color name="md_theme_secondary">#FF1744</color>
+    <color name="md_theme_secondary">#D71921</color>
     <color name="md_theme_onSecondary">#FFFFFF</color>
     <color name="md_theme_secondaryContainer">#5C0A1E</color>
     <color name="md_theme_onSecondaryContainer">#FFDAD6</color>
-    <color name="md_theme_tertiary">#FF1744</color>
+    <color name="md_theme_tertiary">#D71921</color>
     <color name="md_theme_onTertiary">#FFFFFF</color>
     <color name="md_theme_tertiaryContainer">#5C0A1E</color>
     <color name="md_theme_onTertiaryContainer">#FFDAD6</color>
-    <color name="md_theme_error">#FF1744</color>
+    <color name="md_theme_error">#D71921</color>
     <color name="md_theme_onError">#FFFFFF</color>
     <color name="md_theme_errorContainer">#5C0A1E</color>
     <color name="md_theme_onErrorContainer">#FFDAD6</color>
@@ -51,7 +51,7 @@
     <color name="md_theme_scrim">#000000</color>
     <color name="md_theme_inverseSurface">#FFFFFF</color>
     <color name="md_theme_inverseOnSurface">#000000</color>
-    <color name="md_theme_inversePrimary">#FF1744</color>
+    <color name="md_theme_inversePrimary">#D71921</color>
     <color name="md_theme_primaryFixed">#FFDAD6</color>
     <color name="md_theme_onPrimaryFixed">#410002</color>
     <color name="md_theme_primaryFixedDim">#FFB4AB</color>

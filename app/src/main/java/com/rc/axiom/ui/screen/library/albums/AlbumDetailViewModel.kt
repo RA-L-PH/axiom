@@ -35,7 +35,7 @@ class AlbumDetailViewModel(
     }
 
     fun getAlbumWiki(album: Album, lang: String?) = liveData(Dispatchers.IO) {
-        if (NetworkFeature.Lastfm.Biographies.isAvailable) {
+        if (NetworkFeature.isOnline(ignoreWifiSetting = true)) {
             emit(repository.albumInfo(album.albumArtistName ?: album.artistName, album.name, lang))
         }
     }

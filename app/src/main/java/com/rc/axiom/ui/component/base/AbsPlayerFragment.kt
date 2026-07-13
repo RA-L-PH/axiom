@@ -22,6 +22,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
@@ -412,10 +413,10 @@ abstract class AbsPlayerFragment(@LayoutRes layoutRes: Int) : Fragment(layoutRes
         val lyricsItem = findItem(R.id.action_show_lyrics)
         if (lyricsItem != null) {
             if (lyricsVisible) {
-                lyricsItem.setIcon(getTintedDrawable(R.drawable.ic_lyrics_24dp))
+                lyricsItem.setIcon(getTintedDrawable(R.drawable.ic_lyrics_filled_red))
                     .setTitle(R.string.action_hide_lyrics)
             } else {
-                lyricsItem.setIcon(getTintedDrawable(R.drawable.ic_lyrics_outline_24dp))
+                lyricsItem.setIcon(getTintedDrawable(R.drawable.ic_lyrics_outline_white))
                     .setTitle(R.string.action_show_lyrics)
             }
         }
@@ -578,39 +579,18 @@ abstract class AbsPlayerFragment(@LayoutRes layoutRes: Int) : Fragment(layoutRes
     }
 
     fun MaterialButton.setIsFavorite(isFavorite: Boolean, withAnimation: Boolean) {
-        /*
-        val iconRes = if (withAnimation) {
-            if (isFavorite) R.drawable.avd_favorite else R.drawable.avd_unfavorite
-        } else {
-            if (isFavorite) R.drawable.ic_favorite_24dp else R.drawable.ic_favorite_outline_24dp
-        }
-         */
-        // There's a bug in the Material Components library that affects the
-        // icon animation on a MaterialButton, so for now, we'll change the
-        // icon in a simple way.
-        val iconRes = if (isFavorite) R.drawable.ic_favorite_24dp else R.drawable.ic_favorite_outline_24dp
-        icon = ContextCompat.getDrawable(context, iconRes).also { drawable ->
-            if (drawable is AnimatedVectorDrawable) {
-                drawable.start()
-            }
-        }
+        val iconRes = if (isFavorite) R.drawable.ic_favorite_filled_red else R.drawable.ic_favorite_outline_white
+        icon = ContextCompat.getDrawable(context, iconRes)
+        iconTint = null // Use drawable's own colors
     }
 
     protected fun Menu.setIsFavorite(isFavorite: Boolean, withAnimation: Boolean) {
-        val iconRes = if (withAnimation) {
-            if (isFavorite) R.drawable.avd_favorite else R.drawable.avd_unfavorite
-        } else {
-            if (isFavorite) R.drawable.ic_favorite_24dp else R.drawable.ic_favorite_outline_24dp
-        }
+        val iconRes = if (isFavorite) R.drawable.ic_favorite_filled_red else R.drawable.ic_favorite_outline_white
         val titleRes = if (isFavorite) R.string.action_remove_from_favorites else R.string.action_add_to_favorites
 
         findItem(R.id.action_favorite)?.apply {
             setTitle(titleRes)
-            icon = getTintedDrawable(iconRes).also {
-                if (it is AnimatedVectorDrawable) {
-                    it.start()
-                }
-            }
+            icon = context?.let { ContextCompat.getDrawable(it, iconRes) }
         }
     }
 

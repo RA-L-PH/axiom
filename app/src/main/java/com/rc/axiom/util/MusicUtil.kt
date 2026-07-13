@@ -34,6 +34,31 @@ typealias CompletionCallback = (deleted: Int) -> Unit
 
 object MusicUtil : KoinComponent {
 
+    fun levenshteinDistance(s1: String, s2: String): Double {
+        val str1 = s1.lowercase().trim()
+        val str2 = s2.lowercase().trim()
+        if (str1 == str2) return 1.0
+        if (str1.isEmpty()) return 0.0
+        if (str2.isEmpty()) return 0.0
+
+        val dp = Array(str1.length + 1) { IntArray(str2.length + 1) }
+        for (i in 0..str1.length) dp[i][0] = i
+        for (j in 0..str2.length) dp[0][j] = j
+
+        for (i in 1..str1.length) {
+            for (j in 1..str2.length) {
+                val cost = if (str1[i - 1] == str2[j - 1]) 0 else 1
+                dp[i][j] = minOf(
+                    dp[i - 1][j] + 1,
+                    dp[i][j - 1] + 1,
+                    dp[i - 1][j - 1] + cost
+                )
+            }
+        }
+        val maxLen = maxOf(str1.length, str2.length)
+        return 1.0 - (dp[str1.length][str2.length].toDouble() / maxLen)
+    }
+
     suspend fun deleteTracks(
         context: Context,
         songs: List<Song>,

@@ -84,28 +84,9 @@ fun MaterialSwitch(
                 )
             }
         }
-        Switch(
+        CustomSquareToggle(
             checked = isChecked,
-            interactionSource = interactionSource,
-            onCheckedChange = null,
-            modifier = Modifier.padding(start = 12.dp, end = 6.dp),
-            thumbContent = {
-                if (isChecked) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_check_24dp),
-                        contentDescription = null,
-                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                    )
-                } else {
-                    if (!enabled) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_close_24dp),
-                            contentDescription = null,
-                            modifier = Modifier.size(SwitchDefaults.IconSize)
-                        )
-                    }
-                }
-            }
+            modifier = Modifier.padding(start = 12.dp, end = 6.dp)
         )
     }
 }

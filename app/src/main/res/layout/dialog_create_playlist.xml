@@ -30,7 +30,7 @@
                 android:layout_height="match_parent"
                 android:background="?attr/colorSurfaceVariant"
                 android:scaleType="centerCrop"
-                app:shapeAppearanceOverlay="?shapeAppearanceCornerSmall"
+                app:shapeAppearanceOverlay="@style/SquareShapeAppearance"
                 tools:ignore="ContentDescription" />
 
             <com.google.android.material.button.MaterialButton
@@ -59,6 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"
+                android:fontFamily="@font/ndot57"
                 android:maxLines="1" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -77,6 +78,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="top"
                 android:inputType="textCapSentences|textMultiLine"
+                android:fontFamily="@font/letteramonoll"
                 android:maxLines="4"
                 android:minLines="2" />
 

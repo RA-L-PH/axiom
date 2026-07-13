@@ -51,6 +51,7 @@
             android:freezesText="true"
             android:singleLine="true"
             android:ellipsize="end"
+            android:fontFamily="@font/letteramonoll"
             app:layout_constraintTop_toBottomOf="@+id/titlesGuideline"
             app:layout_constraintStart_toEndOf="@+id/favorite"
             app:layout_constraintEnd_toStartOf="@+id/menu"
@@ -205,6 +206,7 @@
             android:singleLine="true"
             android:ellipsize="end"
             android:textAppearance="?textAppearanceBody2"
+            android:fontFamily="@font/letteramonoll"
             tools:text="@tools:sample/lorem" />
 
     </FrameLayout>

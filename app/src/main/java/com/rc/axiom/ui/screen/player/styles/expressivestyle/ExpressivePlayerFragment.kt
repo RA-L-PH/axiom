@@ -221,10 +221,10 @@ class ExpressivePlayerFragment : AbsPlayerFragment(R.layout.fragment_expressive_
     override fun onLyricsVisibilityChange(animatorSet: AnimatorSet, lyricsVisible: Boolean) {
         _binding?.showLyricsButton?.let {
             if (lyricsVisible) {
-                it.setIconResource(R.drawable.ic_lyrics_24dp)
+                it.setIconResource(R.drawable.ic_lyrics_filled_red)
                 it.contentDescription = getString(R.string.action_hide_lyrics)
             } else {
-                it.setIconResource(R.drawable.ic_lyrics_outline_24dp)
+                it.setIconResource(R.drawable.ic_lyrics_outline_white)
                 it.contentDescription = getString(R.string.action_show_lyrics)
             }
         }

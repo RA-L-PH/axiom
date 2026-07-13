@@ -13,6 +13,11 @@ import com.rc.axiom.data.model.network.ScrobblingResult
 import com.rc.axiom.data.model.network.ScrobblingService
 import com.rc.axiom.data.model.network.lastfm.LastFmFailure
 import com.rc.axiom.data.remote.deezer.DeezerService
+import com.rc.axiom.data.remote.musicbrainz.MusicBrainzService
+import com.rc.axiom.data.remote.wikipedia.WikipediaService
+import com.rc.axiom.data.remote.spotify.SpotifyService
+import com.rc.axiom.data.remote.audiodb.AudioDbService
+import com.rc.axiom.data.model.network.NetworkFeature
 import com.rc.axiom.data.remote.deezer.model.DeezerAlbum
 import com.rc.axiom.data.remote.deezer.model.DeezerArtist
 import com.rc.axiom.data.remote.deezer.model.DeezerTrack
@@ -48,19 +53,23 @@ interface NetworkRepository {
     suspend fun logoutFromService(service: ScrobblingService)
     suspend fun scrobble(service: ScrobblingService, song: Song, timestamp: Long): ScrobblingResult
     suspend fun updateNowPlaying(service: ScrobblingService, song: Song): ScrobblingResult
-    suspend fun artistInfo(name: String, lang: String?, cache: String?): LastFmArtist?
+    suspend fun artistInfo(name: String, lang: String?, cache: String?, songTitles: List<String> = emptyList(), albumTitles: List<String> = emptyList()): LastFmArtist?
     suspend fun albumInfo(artist: String, album: String, lang: String?): LastFmAlbum?
     suspend fun deezerTrack(artist: String, title: String): DeezerTrack?
-    suspend fun deezerArtist(name: String, limit: Int, index: Int): DeezerArtist?
+    suspend fun deezerArtist(name: String, limit: Int, index: Int, songTitles: List<String> = emptyList(), albumTitles: List<String> = emptyList()): DeezerArtist?
     suspend fun deezerAlbum(artist: String, name: String): DeezerAlbum?
+    fun clearArtistCache(name: String)
 }
 
 class NetworkRepositoryImpl(
     private val context: Context,
     private val preferences: SharedPreferences,
-    private val lastFmService: LastFmService,
     private val listenBrainzService: ListenBrainzService,
-    private val deezerService: DeezerService
+    private val deezerService: DeezerService,
+    private val musicBrainzService: MusicBrainzService,
+    private val wikipediaService: WikipediaService,
+    private val spotifyService: SpotifyService,
+    private val audioDbService: AudioDbService
 ) : NetworkRepository {
 
     private val lastFmLoginStateFlow = MutableStateFlow<LoginState>(LoginState.Empty)
@@ -70,6 +79,28 @@ class NetworkRepositoryImpl(
     private val listenBrainzLoginState get() = listenBrainzLoginStateFlow.value
 
     private val appName = context.getString(R.string.app_name)
+
+    private fun getCachedValue(key: String): String? {
+        return preferences.getString("net_cache_$key", null)
+    }
+
+    private fun setCachedValue(key: String, value: String) {
+        preferences.edit().putString("net_cache_$key", value).apply()
+    }
+
+    override fun clearArtistCache(name: String) {
+        val cacheKeyBio = "artist_bio_${name.lowercase()}"
+        val cacheKeyImg = "artist_img_${name.lowercase()}"
+        preferences.edit {
+            remove("net_cache_$cacheKeyBio")
+            remove("net_cache_$cacheKeyImg")
+            remove("net_cache_${cacheKeyBio}_debut")
+            remove("net_cache_${cacheKeyBio}_genre")
+            remove("net_cache_${cacheKeyBio}_style")
+            remove("net_cache_${cacheKeyBio}_mood")
+            remove("net_cache_${cacheKeyBio}_country")
+        }
+    }
 
     init {
         val lastFmSessionInfo = getLastFmSessionInfo()
@@ -120,6 +151,9 @@ class NetworkRepositoryImpl(
         song: Song,
         timestamp: Long
     ): ScrobblingResult {
+        if (service == ScrobblingService.Lastfm) {
+            return ScrobblingResult.Failure("Last.fm is disabled")
+        }
         return when (service) {
             ScrobblingService.Lastfm -> scrobbleToLastfm(song, timestamp)
             ScrobblingService.ListenBrainz -> scrobbleToListenBrainz(song, timestamp)
@@ -130,31 +164,174 @@ class NetworkRepositoryImpl(
         service: ScrobblingService,
         song: Song
     ): ScrobblingResult {
+        if (service == ScrobblingService.Lastfm) {
+            return ScrobblingResult.Failure("Last.fm is disabled")
+        }
         return when (service) {
             ScrobblingService.Lastfm -> updateNowPlayingOnLastfm(song)
             ScrobblingService.ListenBrainz -> updateNowPlayingOnListenBrainz(song)
         }
     }
 
-    override suspend fun artistInfo(name: String, lang: String?, cache: String?): LastFmArtist? {
-        return try {
-            lastFmService.artistInfo(name, lang, cache)
-        } catch (e: Exception) {
-            Log.e(TAG, "Last.fm: artist info couldn't be retrieved!", e)
-            null
+    override suspend fun artistInfo(
+        name: String,
+        lang: String?,
+        cache: String?,
+        songTitles: List<String>,
+        albumTitles: List<String>
+    ): LastFmArtist? {
+        val cacheKey = "artist_bio_${name.lowercase()}"
+        val cachedBio = getCachedValue(cacheKey)
+        if (cachedBio != null) {
+            return LastFmArtist(
+                artist = LastFmArtist.Artist(
+                    bio = LastFmArtist.Bio(
+                        content = cachedBio
+                    )
+                ),
+                debutYear = getCachedValue("${cacheKey}_debut"),
+                genre = getCachedValue("${cacheKey}_genre"),
+                style = getCachedValue("${cacheKey}_style"),
+                mood = getCachedValue("${cacheKey}_mood"),
+                country = getCachedValue("${cacheKey}_country")
+            )
         }
+
+        if (NetworkFeature.Services.Wikipedia.isAvailable) {
+            val wikiBio = wikipediaService.getArtistBio(name, songTitles, albumTitles)
+            if (!wikiBio.isNullOrEmpty()) {
+                setCachedValue(cacheKey, wikiBio)
+                return LastFmArtist(
+                    artist = LastFmArtist.Artist(
+                        bio = LastFmArtist.Bio(
+                            content = wikiBio
+                        )
+                    )
+                )
+            }
+        }
+
+        if (NetworkFeature.Services.AudioDb.isAvailable) {
+            val audioDbArtist = audioDbService.getArtistDetails(name)
+            val audioDbBio = audioDbArtist?.strBiographyEN
+            if (!audioDbBio.isNullOrEmpty()) {
+                setCachedValue(cacheKey, audioDbBio)
+                if (!audioDbArtist.intFormedYear.isNullOrEmpty()) setCachedValue("${cacheKey}_debut", audioDbArtist.intFormedYear)
+                if (!audioDbArtist.strGenre.isNullOrEmpty()) setCachedValue("${cacheKey}_genre", audioDbArtist.strGenre)
+                if (!audioDbArtist.strStyle.isNullOrEmpty()) setCachedValue("${cacheKey}_style", audioDbArtist.strStyle)
+                if (!audioDbArtist.strMood.isNullOrEmpty()) setCachedValue("${cacheKey}_mood", audioDbArtist.strMood)
+                if (!audioDbArtist.strCountry.isNullOrEmpty()) setCachedValue("${cacheKey}_country", audioDbArtist.strCountry)
+                
+                return LastFmArtist(
+                    artist = LastFmArtist.Artist(
+                        bio = LastFmArtist.Bio(
+                            content = audioDbBio
+                        )
+                    ),
+                    debutYear = audioDbArtist.intFormedYear,
+                    genre = audioDbArtist.strGenre,
+                    style = audioDbArtist.strStyle,
+                    mood = audioDbArtist.strMood,
+                    country = audioDbArtist.strCountry
+                )
+            }
+        }
+
+        if (NetworkFeature.Services.MusicBrainz.isAvailable) {
+            val mbBio = musicBrainzService.getArtistInfo(name)
+            if (!mbBio.isNullOrEmpty()) {
+                setCachedValue(cacheKey, mbBio)
+                return LastFmArtist(
+                    artist = LastFmArtist.Artist(
+                        bio = LastFmArtist.Bio(
+                            content = mbBio
+                        )
+                    )
+                )
+            }
+        }
+        return null
     }
 
     override suspend fun albumInfo(artist: String, album: String, lang: String?): LastFmAlbum? {
-        return try {
-            lastFmService.albumInfo(album, artist, lang)
-        } catch (e: Exception) {
-            Log.e(TAG, "Last.fm: album info couldn't be retrieved!", e)
-            null
+        val cacheKey = "album_bio_${artist.lowercase()}_${album.lowercase()}"
+        val cachedBio = getCachedValue(cacheKey)
+        if (cachedBio != null) {
+            return LastFmAlbum(
+                album = LastFmAlbum.Album(
+                    wiki = LastFmAlbum.Wiki(
+                        content = cachedBio
+                    )
+                )
+            )
         }
+
+        if (NetworkFeature.Services.Wikipedia.isAvailable) {
+            val wikiBio = wikipediaService.getAlbumBio(artist, album)
+            if (!wikiBio.isNullOrEmpty()) {
+                setCachedValue(cacheKey, wikiBio)
+                return LastFmAlbum(
+                    album = LastFmAlbum.Album(
+                        wiki = LastFmAlbum.Wiki(
+                            content = wikiBio
+                        )
+                    )
+                )
+            }
+        }
+
+        if (NetworkFeature.Services.MusicBrainz.isAvailable) {
+            val mbBio = musicBrainzService.getAlbumInfo(artist, album)
+            if (!mbBio.isNullOrEmpty()) {
+                setCachedValue(cacheKey, mbBio)
+                return LastFmAlbum(
+                    album = LastFmAlbum.Album(
+                        wiki = LastFmAlbum.Wiki(
+                            content = mbBio
+                        )
+                    )
+                )
+            }
+        }
+        return null
     }
 
     override suspend fun deezerTrack(artist: String, title: String): DeezerTrack? {
+        val cacheKey = "track_img_${artist.lowercase()}_${title.lowercase()}"
+        val cachedUrl = getCachedValue(cacheKey)
+        if (cachedUrl != null) {
+            return DeezerTrack(
+                data = listOf(
+                    DeezerTrack.TrackData(
+                        album = DeezerTrack.TrackData.Album(
+                            image = cachedUrl,
+                            smallImage = cachedUrl,
+                            mediumImage = cachedUrl,
+                            largeImage = cachedUrl
+                        )
+                    )
+                )
+            )
+        }
+
+        if (NetworkFeature.Services.MusicBrainz.isAvailable) {
+            val mbUrl = musicBrainzService.getTrackCoverUrl(artist, title)
+            if (!mbUrl.isNullOrEmpty()) {
+                setCachedValue(cacheKey, mbUrl)
+                return DeezerTrack(
+                    data = listOf(
+                        DeezerTrack.TrackData(
+                            album = DeezerTrack.TrackData.Album(
+                                image = mbUrl,
+                                smallImage = mbUrl,
+                                mediumImage = mbUrl,
+                                largeImage = mbUrl
+                            )
+                        )
+                    )
+                )
+            }
+        }
         return try {
             deezerService.track(artist, title)
         } catch (e: Exception) {
@@ -163,7 +340,85 @@ class NetworkRepositoryImpl(
         }
     }
 
-    override suspend fun deezerArtist(name: String, limit: Int, index: Int): DeezerArtist? {
+    override suspend fun deezerArtist(
+        name: String,
+        limit: Int,
+        index: Int,
+        songTitles: List<String>,
+        albumTitles: List<String>
+    ): DeezerArtist? {
+        val cacheKey = "artist_img_${name.lowercase()}"
+        val cachedUrl = getCachedValue(cacheKey)
+        if (cachedUrl != null) {
+            return DeezerArtist(
+                result = listOf(
+                    DeezerArtist.Result(
+                        artistName = name,
+                        image = cachedUrl,
+                        smallImage = cachedUrl,
+                        mediumImage = cachedUrl,
+                        largeImage = cachedUrl
+                    )
+                ),
+                total = 1
+            )
+        }
+
+        if (NetworkFeature.Services.Spotify.isAvailable) {
+            val spotifyUrl = spotifyService.getArtistImageUrl(name, songTitles, albumTitles)
+            if (!spotifyUrl.isNullOrEmpty()) {
+                setCachedValue(cacheKey, spotifyUrl)
+                return DeezerArtist(
+                    result = listOf(
+                        DeezerArtist.Result(
+                            artistName = name,
+                            image = spotifyUrl,
+                            smallImage = spotifyUrl,
+                            mediumImage = spotifyUrl,
+                            largeImage = spotifyUrl
+                        )
+                    ),
+                    total = 1
+                )
+            }
+        }
+        if (NetworkFeature.Services.AudioDb.isAvailable) {
+            val audioDbArtist = audioDbService.getArtistDetails(name)
+            val audioDbImg = audioDbArtist?.strArtistThumb
+            if (!audioDbImg.isNullOrEmpty()) {
+                setCachedValue(cacheKey, audioDbImg)
+                return DeezerArtist(
+                    result = listOf(
+                        DeezerArtist.Result(
+                            artistName = name,
+                            image = audioDbImg,
+                            smallImage = audioDbImg,
+                            mediumImage = audioDbImg,
+                            largeImage = audioDbImg
+                        )
+                    ),
+                    total = 1
+                )
+            }
+        }
+        if (NetworkFeature.Services.Wikipedia.isAvailable) {
+            val wikiUrl = wikipediaService.getArtistImageUrl(name, songTitles)
+            if (!wikiUrl.isNullOrEmpty()) {
+                setCachedValue(cacheKey, wikiUrl)
+                return DeezerArtist(
+                    result = listOf(
+                        DeezerArtist.Result(
+                            artistName = name,
+                            image = wikiUrl,
+                            smallImage = wikiUrl,
+                            mediumImage = wikiUrl,
+                            largeImage = wikiUrl
+                        )
+                    ),
+                    total = 1
+                )
+            }
+        }
         return try {
             deezerService.artist(name, limit, index)
         } catch (e: Exception) {
@@ -173,6 +428,56 @@ class NetworkRepositoryImpl(
     }
 
     override suspend fun deezerAlbum(artist: String, name: String): DeezerAlbum? {
+        val cacheKey = "album_img_${artist.lowercase()}_${name.lowercase()}"
+        val cachedUrl = getCachedValue(cacheKey)
+        if (cachedUrl != null) {
+            return DeezerAlbum(
+                data = listOf(
+                    DeezerAlbum.AlbumData(
+                        title = name,
+                        image = cachedUrl,
+                        smallImage = cachedUrl,
+                        mediumImage = cachedUrl,
+                        largeImage = cachedUrl
+                    )
+                )
+            )
+        }
+
+        if (NetworkFeature.Services.MusicBrainz.isAvailable) {
+            val mbUrl = musicBrainzService.getAlbumCoverUrl(artist, name)
+            if (!mbUrl.isNullOrEmpty()) {
+                setCachedValue(cacheKey, mbUrl)
+                return DeezerAlbum(
+                    data = listOf(
+                        DeezerAlbum.AlbumData(
+                            title = name,
+                            image = mbUrl,
+                            smallImage = mbUrl,
+                            mediumImage = mbUrl,
+                            largeImage = mbUrl
+                        )
+                    )
+                )
+            }
+        }
+        if (NetworkFeature.Services.Wikipedia.isAvailable) {
+            val wikiUrl = wikipediaService.getAlbumCoverUrl(artist, name)
+            if (!wikiUrl.isNullOrEmpty()) {
+                setCachedValue(cacheKey, wikiUrl)
+                return DeezerAlbum(
+                    data = listOf(
+                        DeezerAlbum.AlbumData(
+                            title = name,
+                            image = wikiUrl,
+                            smallImage = wikiUrl,
+                            mediumImage = wikiUrl,
+                            largeImage = wikiUrl
+                        )
+                    )
+                )
+            }
+        }
         return try {
             deezerService.album(artist, name)
         } catch (e: Exception) {
@@ -182,151 +487,19 @@ class NetworkRepositoryImpl(
     }
 
     private suspend fun loginToLastFm(username: String, password: String) {
-        val currentState = this.lastFmLoginState
-        if (currentState is LoginState.LoggingIn) return
-        if (currentState is LoginState.LoggedIn) {
-            if (currentState.username == username) return
-        }
-        lastFmLoginStateFlow.value = LoginState.LoggingIn
-        try {
-            val userResponse = lastFmService.userInfo(username)
-            val sessionResponse = lastFmService.createSession(userResponse.user.name, password)
-            if (sessionResponse is LastFmSessionResponse) {
-                val session = sessionResponse.session
-                if (session != null && session.key.isNotBlank()) {
-                    val isSuccess = setLastfmSessionInfo(userResponse.user, session.key)
-                    if (isSuccess) {
-                        lastFmLoginStateFlow.value = LoginState.LoggedIn(
-                            userResponse.user.name,
-                            userResponse.user.url
-                        )
-                        return
-                    }
-                }
-                lastFmLoginStateFlow.value = LoginState.Failure(context.getString(R.string.error_lastfm_generic))
-            } else if (sessionResponse is LastFmError) {
-                val failure = LastFmFailure.fromCode(sessionResponse.error)
-                lastFmLoginStateFlow.value = LoginState.Failure(
-                    context.getString(failure.messageRes)
-                )
-                return
-            }
-        } catch (e: Exception) {
-            when (e) {
-                is ClientRequestException -> {
-                    val failure = try {
-                        val responseAsText = e.response.bodyAsText()
-                        val lastFmError = Json.decodeFromString<LastFmError>(responseAsText)
-                        LastFmFailure.fromCode(lastFmError.error)
-                    } catch (_: Exception) {
-                        LastFmFailure.Unknown
-                    }
-                    lastFmLoginStateFlow.value = LoginState.Failure(context.getString(failure.messageRes))
-                }
-
-                is ConnectException,
-                is SocketTimeoutException -> {
-                    lastFmLoginStateFlow.value = LoginState.Failure(
-                        context.getString(R.string.error_network_timeout)
-                    )
-                }
-
-                else -> {
-                    Log.e(TAG, "Last.fm: log-in error", e)
-                    lastFmLoginStateFlow.value = LoginState.Failure(
-                        context.getString(R.string.error_lastfm_generic)
-                    )
-                }
-            }
-        }
+        lastFmLoginStateFlow.value = LoginState.Empty
     }
 
     private fun logoutFromLastFm() {
-        try {
-            preferences.edit(commit = true) {
-                remove(LAST_FM_SESSION_INFO)
-            }
-            lastFmLoginStateFlow.value = LoginState.Empty
-        } catch (e: Exception) {
-            Log.e(TAG, "Last.fm: logout error", e)
-        }
+        lastFmLoginStateFlow.value = LoginState.Empty
     }
 
     private suspend fun scrobbleToLastfm(song: Song, timestamp: Long): ScrobblingResult {
-        val sessionInfo = getLastFmSessionInfoOrLogout()
-            ?: return ScrobblingResult.Failure(context.getString(R.string.error_lastfm_auth))
-
-        try {
-            val response = lastFmService.scrobble(
-                artist = song.displayArtistName(),
-                track = song.title,
-                album = song.albumName,
-                timestamp = timestamp,
-                sk = sessionInfo.key
-            )
-
-            val result = when (response) {
-                is ScrobbleResponse -> {
-                    val scrobbleData = response.scrobbles.scrobble.firstOrNull()
-                    val ignoredMessage = scrobbleData?.ignoredMessage
-                    if (response.scrobbles.attr.accepted > 0 && ignoredMessage?.code == "0") {
-                        ScrobblingResult.Success(song.id)
-                    } else {
-                        ScrobblingResult.Failure(ignoredMessage?.text)
-                    }
-                }
-
-                is LastFmError -> {
-                    response.toScrobblingResult()
-                }
-
-                else -> {
-                    ScrobblingResult.Failure()
-                }
-            }
-
-            return result
-        } catch (e: Exception) {
-            Log.e(TAG, "Last.fm: scrobble call failed!", e)
-            return ScrobblingResult.Failure()
-        }
+        return ScrobblingResult.Failure("Last.fm is disabled")
     }
 
     private suspend fun updateNowPlayingOnLastfm(song: Song): ScrobblingResult {
-        val sessionInfo = getLastFmSessionInfoOrLogout()
-            ?: return ScrobblingResult.Failure()
-
-        try {
-            val response = lastFmService.updateNowPlaying(
-                artist = song.displayArtistName(),
-                track = song.title,
-                sk = sessionInfo.key
-            )
-
-            val result = when (response) {
-                is NowPlayingResponse -> {
-                    val nowPlayingData = response.nowplaying
-                    val ignoredMessage = nowPlayingData.ignoredMessage
-                    if (ignoredMessage.code == "0") {
-                        ScrobblingResult.Success(song.id)
-                    } else {
-                        ScrobblingResult.Failure(ignoredMessage.text)
-                    }
-                }
-
-                is LastFmError -> {
-                    response.toScrobblingResult()
-                }
-
-                else -> {
-                    ScrobblingResult.Failure()
-                }
-            }
-            return result
-        } catch (e: Exception) {
-            Log.e(TAG, "Last.fm: updateNowPlaying call failed!", e)
-            return ScrobblingResult.Failure()
-        }
+        return ScrobblingResult.Failure("Last.fm is disabled")
     }
 
     private fun getLastFmSessionInfoOrLogout(): LastFmSessionInfo? {

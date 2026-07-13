@@ -30,6 +30,7 @@ import com.rc.axiom.core.sort.SongSortMode
 import com.rc.axiom.data.model.Song
 import com.rc.axiom.ui.ISongCallback
 import com.rc.axiom.ui.adapters.song.SongAdapter
+import com.rc.axiom.extensions.launchAndRepeatWithViewLifecycle
 import com.rc.axiom.ui.component.base.AbsRecyclerViewCustomGridSizeFragment
 import com.rc.axiom.ui.component.menu.onSongMenu
 import com.rc.axiom.ui.component.menu.onSongsMenu
@@ -53,6 +54,11 @@ class SongListFragment : AbsRecyclerViewCustomGridSizeFragment<SongAdapter, Grid
         super.onViewCreated(view, savedInstanceState)
         libraryViewModel.getSongs().observe(viewLifecycleOwner) { songs ->
             adapter?.dataSet = songs
+        }
+        viewLifecycleOwner.launchAndRepeatWithViewLifecycle {
+            playerViewModel.currentSongFlow.collect { song ->
+                adapter?.currentSongId = song.id
+            }
         }
     }
 

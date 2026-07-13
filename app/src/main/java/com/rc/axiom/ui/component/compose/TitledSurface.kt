@@ -50,9 +50,8 @@ fun SwitchCard(
         title = title,
         style = style,
         titleEndContent = {
-            Switch(
-                checked = checked,
-                onCheckedChange = null
+            CustomSquareToggle(
+                checked = checked
             )
         },
         iconRes = iconRes,

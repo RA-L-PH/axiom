@@ -52,16 +52,31 @@
     </style>
 
     <style name="HomeActionButton" parent="Widget.Material3Expressive.Button">
-        <item name="android:gravity">start|center_vertical</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:lines">2</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
-        <item name="android:textColor">?colorOnSurface</item>
-        <item name="backgroundTint">?colorSurfaceContainerLow</item>
-        <item name="cornerRadius">20dp</item>
-        <item name="iconPadding">16dp</item>
-        <item name="iconTint">?colorOnSurface</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="strokeColor">#FFFFFF</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="fontFamily">@font/ndot57</item>
+        <item name="android:fontFamily">@font/ndot57</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="icon">@null</item>
+    </style>
+
+    <style name="HomeActionButton.Shuffle" parent="Widget.Material3Expressive.Button">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">#D71921</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="strokeColor">#D71921</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="fontFamily">@font/ndot57</item>
+        <item name="android:fontFamily">@font/ndot57</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="icon">@null</item>
     </style>
 
     <style name="PlayerIconButton" parent="Widget.Material3Expressive.Button.IconButton.Standard">
@@ -113,6 +128,10 @@
     <style name="CircularShapeAppearance" parent="">
         <item name="cornerSize">50%</item>
         <item name="cornerFamily">rounded</item>
+    </style>
+
+    <style name="SquareShapeAppearance" parent="">
+        <item name="cornerSize">0dp</item>
     </style>
 
     <style name="Base.SquigglySlider" parent="Widget.AppCompat.ProgressBar.Horizontal">

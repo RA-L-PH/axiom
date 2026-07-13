@@ -9,30 +9,71 @@
     android:background="@drawable/rect_selector"
     android:orientation="vertical">
 
-    <com.rc.axiom.ui.component.views.AxiomShapeableImageView
-        android:id="@+id/image"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="156dp"
         android:layout_height="156dp"
-        android:scaleType="centerCrop"
-        android:background="@android:color/transparent"
+        app:cardCornerRadius="78dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="1dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        android:clipToOutline="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:axiomCornerSize="72dp"
-        tools:src="@tools:sample/avatars" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="2"
-        android:paddingTop="12dp"
-        android:textAppearance="?textAppearanceBody1"
-        android:textColor="?android:attr/textColorPrimary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/image"
-        tools:text="@tools:sample/full_names" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                tools:src="@tools:sample/avatars"
+                android:importantForAccessibility="no" />
+
+            <!-- Full Circular Overlay -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#8064748B"/>
+
+            <!-- Artist Name centered vertically and horizontally -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:fontFamily="@font/ndot57"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                tools:text="ED SHEERAN"/>
+
+            <!-- Metadata centered at the bottom of the circle -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="20dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:fontFamily="@font/letteramonoll"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                tools:text="1a . 1s"/>
+
+        </FrameLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

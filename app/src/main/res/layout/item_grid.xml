@@ -11,68 +11,86 @@
     android:focusable="true"
     tools:ignore="MissingPrefix">
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:ignore="UnusedAttribute,UselessParent">
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="0dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="0dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        android:clipToOutline="true">
 
         <com.rc.axiom.ui.component.views.WidthFitSquareLayout
             android:id="@+id/image_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.imageview.ShapeableImageView
+            <ImageView
                 android:id="@+id/image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                app:shapeAppearanceOverlay="?shapeAppearanceCornerLarge"
-                tools:srcCompat="@tools:sample/backgrounds/scenic"/>
+                tools:ignore="ContentDescription"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/play"
-                style="?materialIconButtonFilledStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="4dp"
-                app:backgroundTint="@color/alpha_surface_container"
-                app:iconTint="?colorOnSurface"
-                app:icon="@drawable/ic_play_24dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#8064748B"/>
 
-        </com.rc.axiom.ui.component.views.WidthFitSquareLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="vertical"
-            android:padding="8dp">
-
+            <!-- Album Title centered inside card -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center"
+                android:maxLines="2"
                 android:ellipsize="end"
-                android:textAppearance="?textAppearanceBody1"
+                android:fontFamily="@font/ndot57"
+                android:textColor="#FFFFFF"
                 android:textStyle="bold"
-                tools:text="@tools:sample/full_names"/>
+                android:textSize="20sp"
+                tools:text="Attention"/>
 
+            <!-- Metadata in bottom-left inside card -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="4dp"
-                android:maxLines="1"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="12dp"
+                android:maxLines="2"
                 android:ellipsize="end"
-                android:textAppearance="?textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary"
-                tools:text="@tools:sample/cities"/>
+                android:fontFamily="@font/letteramonoll"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                tools:text="Ed Sheeran\n10 Songs"/>
 
-        </LinearLayout>
+            <!-- Play button in bottom-right inside card -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/play"
+                style="?materialIconButtonStyle"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="8dp"
+                android:padding="6dp"
+                app:icon="@drawable/ic_play_24dp"
+                app:iconTint="#FFFFFF"
+                app:backgroundTint="@android:color/transparent"
+                app:strokeColor="#FFFFFF"
+                app:strokeWidth="1dp"
+                app:cornerRadius="16dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp" />
 
-    </LinearLayout>
+        </com.rc.axiom.ui.component.views.WidthFitSquareLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </FrameLayout>

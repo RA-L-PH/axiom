@@ -38,7 +38,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_back_24dp" />
+                app:navigationIcon="@drawable/ic_back_24dp"
+                app:titleTextAppearance="@style/TextAppearance.Axiom.Toolbar.Title" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

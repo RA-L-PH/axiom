@@ -71,6 +71,7 @@ class ArtistAdapter constructor(
         holder.menu?.isGone = isChecked
         holder.title?.text = getArtistTitle(artist)
         holder.text?.text = getArtistText(holder, artist)
+        
         val transitionName = if (albumArtistsOnly) artist.name else artist.id.toString()
         if (holder.imageContainer != null) {
             holder.imageContainer.transitionName = transitionName
@@ -81,11 +82,17 @@ class ArtistAdapter constructor(
     }
 
     private fun getArtistTitle(artist: Artist): String {
-        return artist.displayName()
+        return artist.displayName().uppercase()
     }
 
     private fun getArtistText(holder: ViewHolder, artist: Artist): String {
-        return artist.artistInfo(holder.itemView.context)
+        val text = artist.artistInfo(holder.itemView.context)
+        return text.replace(" albums", "a")
+            .replace(" album", "a")
+            .replace(" songs", "s")
+            .replace(" song", "s")
+            .replace(" • ", " . ")
+            .replace(" &bull; ", " . ")
     }
 
     override fun getItemCount(): Int {

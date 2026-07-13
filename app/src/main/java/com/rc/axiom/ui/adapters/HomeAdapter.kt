@@ -18,13 +18,17 @@
 package com.rc.axiom.ui.adapters
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.textview.MaterialTextView
 import com.rc.axiom.R
 import com.rc.axiom.data.model.Suggestion
 import com.rc.axiom.ui.IHomeCallback
@@ -55,7 +59,26 @@ class HomeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val suggestion = dataSet[position]
-        holder.headingTitle?.setText(suggestion.type.titleRes)
+        val title = holder.itemView.context.getString(suggestion.type.titleRes)
+        val spannable = SpannableStringBuilder(title)
+        
+        // Make words that don't contain "Recent" red
+        val words = title.split(" ")
+        var startIndex = 0
+        for (word in words) {
+            val endIndex = startIndex + word.length
+            if (!word.contains("Recent", ignoreCase = true)) {
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#D71921")),
+                    startIndex,
+                    endIndex,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            startIndex = endIndex + 1
+        }
+        
+        holder.headingTitle?.text = spannable
         if (holder.recyclerView != null) {
             holder.recyclerView.layoutManager = LinearLayoutManager(holder.itemView.context, RecyclerView.HORIZONTAL, false)
             holder.recyclerView.adapter = callback.createSuggestionAdapter(suggestion)
@@ -74,7 +97,7 @@ class HomeAdapter(
     inner class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
         internal val headingTitle: TextView? = itemView.findViewById(R.id.heading_title)
-        internal val openSuggestion: MaterialButton? = itemView.findViewById(R.id.open)
+        internal val openSuggestion: MaterialTextView? = itemView.findViewById(R.id.open)
         internal val recyclerView: RecyclerView? = itemView.findViewById(R.id.recycler_view)
 
         init {

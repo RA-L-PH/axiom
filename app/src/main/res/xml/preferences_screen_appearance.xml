@@ -14,7 +14,9 @@
     <SwitchPreferenceCompat
         app:iconSpaceReserved="true"
         app:title="@string/material_you_title"
-        app:defaultValue="@bool/md3_supported"
+        app:defaultValue="false"
+        app:enabled="false"
+        app:summary="Disabled for axiom"
         app:layout="@layout/list_item_view"
         app:widgetLayout="@layout/preference_switch"
         app:key="material_you"/>
@@ -22,7 +24,9 @@
     <SwitchPreferenceCompat
         app:iconSpaceReserved="true"
         app:title="@string/pure_black_theme_title"
-        app:defaultValue="false"
+        app:defaultValue="true"
+        app:enabled="false"
+        app:summary="Always on"
         app:layout="@layout/list_item_view"
         app:widgetLayout="@layout/preference_switch"
         app:key="black_theme"/>
@@ -72,7 +76,9 @@
             app:entries="@array/pref_tab_titles_mode_entries"
             app:entryValues="@array/pref_tab_titles_mode_values"
             app:useSimpleSummaryProvider="true"
-            app:defaultValue="selected"
+            app:defaultValue="unlabelled"
+            app:enabled="false"
+            app:summary="Always unlabelled"
             app:layout="@layout/list_item_view"
             app:key="tab_titles_mode"/>
 

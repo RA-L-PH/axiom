@@ -18,6 +18,8 @@
 package com.rc.axiom.ui.adapters.song
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -35,8 +37,11 @@ import com.rc.axiom.core.model.action.SongClickBehavior
 import com.rc.axiom.core.model.sort.SortKey
 import com.rc.axiom.core.sort.SongSortMode
 import com.rc.axiom.data.model.Song
+import com.rc.axiom.extensions.dp
 import com.rc.axiom.extensions.isActivated
 import com.rc.axiom.extensions.loadPaletteImage
+import com.rc.axiom.extensions.resources.textColorPrimary
+import com.rc.axiom.extensions.resources.textColorSecondary
 import com.rc.axiom.extensions.media.asSectionName
 import com.rc.axiom.extensions.media.displayArtistName
 import com.rc.axiom.extensions.media.songInfo
@@ -68,6 +73,17 @@ open class SongAdapter(
             notifyDataSetChanged()
         }
 
+    var currentSongId: Long = -1L
+        set(value) {
+            if (field != value) {
+                val oldPosition = dataSet.indexOfFirst { it.id == field }
+                val newPosition = dataSet.indexOfFirst { it.id == value }
+                field = value
+                if (oldPosition >= 0) notifyItemChanged(oldPosition)
+                if (newPosition >= 0) notifyItemChanged(newPosition)
+            }
+        }
+
     protected open fun createViewHolder(view: View, viewType: Int): ViewHolder {
         return ViewHolder(view)
     }
@@ -84,6 +100,33 @@ open class SongAdapter(
         holder.menu?.isGone = isChecked
         holder.title?.text = getSongTitle(song)
         holder.text?.text = getSongText(song)
+        
+        val isCurrentSong = song.id == currentSongId
+        val redColor = 0xFFD71921.toInt()
+        val defaultTitleColor = holder.itemView.context.textColorPrimary()
+        val defaultTextColor = holder.itemView.context.textColorSecondary()
+        holder.title?.setTextColor(if (isCurrentSong) redColor else defaultTitleColor)
+        holder.text?.setTextColor(if (isCurrentSong) redColor else defaultTextColor)
+        
+        // Red border on artwork for current song
+        val shapeImage = holder.image as? com.google.android.material.imageview.ShapeableImageView
+        if (shapeImage != null) {
+            if (isCurrentSong) {
+                shapeImage.strokeWidth = 3.dp(holder.itemView.resources).toFloat()
+                shapeImage.strokeColor = ColorStateList.valueOf(redColor)
+            } else {
+                shapeImage.strokeWidth = 1.dp(holder.itemView.resources).toFloat()
+                shapeImage.strokeColor = ColorStateList.valueOf(Color.WHITE)
+            }
+        }
+        
+        // Red tint on menu for current song
+        holder.menu?.iconTint = if (isCurrentSong) {
+            ColorStateList.valueOf(redColor)
+        } else {
+            null
+        }
+        
         // Check if imageContainer exists, so we can have a smooth transition without
         // CardView clipping, if it doesn't exist in current layout set transition name to image instead.
         if (holder.imageContainer != null) {

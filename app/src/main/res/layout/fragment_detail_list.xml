@@ -37,6 +37,7 @@
                     android:maxLines="2"
                     android:textAppearance="?textAppearanceHeadline5"
                     android:textColor="?android:attr/textColorPrimary"
+                    android:fontFamily="@font/ndot57"
                     app:layout_constrainedWidth="true"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -116,7 +117,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_back_24dp" />
+                app:navigationIcon="@drawable/ic_back_24dp"
+                app:titleTextAppearance="@style/TextAppearance.Axiom.Toolbar.Title" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
