@@ -28,7 +28,7 @@ export default function Hero() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <img src="/axiom-logo.png" alt="axiom." className="w-24 h-24 object-contain" />
+            <img src="./axiom-logo.png" alt="axiom." className="w-24 h-24 object-contain" />
           </motion.div>
 
           <h1 className="mt-6 text-6xl md:text-8xl font-ndot tracking-tight text-axiom-white">

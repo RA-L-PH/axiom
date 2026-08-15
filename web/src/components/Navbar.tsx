@@ -15,7 +15,7 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-axiom-black/90 backdrop-blur-sm border-b border-axiom-border">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <a href="#" className="flex items-center gap-3 group">
-          <img src="/axiom-logo.png" alt="axiom." className="w-8 h-8 object-contain" />
+          <img src="./axiom-logo.png" alt="axiom." className="w-8 h-8 object-contain" />
           <span className="font-space text-sm tracking-[0.2em] text-axiom-white group-hover:text-axiom-red transition-colors">
             a<span className="text-axiom-red">x</span>i<span className="text-axiom-red">o</span>m.
           </span>

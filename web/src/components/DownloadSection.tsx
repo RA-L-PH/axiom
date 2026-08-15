@@ -52,7 +52,7 @@ export default function DownloadSection() {
           viewport={{ once: true }}
           className="text-center"
         >
-          <img src="/axiom-logo.png" alt="axiom." className="w-20 h-20 object-contain mx-auto mb-8" />
+          <img src="./axiom-logo.png" alt="axiom." className="w-20 h-20 object-contain mx-auto mb-8" />
 
           <h3 className="text-3xl md:text-4xl font-light text-axiom-white mb-4 font-space">
             Get a<span className="text-axiom-red">x</span>i<span className="text-axiom-red">o</span>m<span className="text-axiom-red">.</span>

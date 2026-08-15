@@ -37,7 +37,7 @@ export default function Footer() {
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 gap-12">
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <img src="/axiom-logo.png" alt="axiom." className="w-7 h-7 object-contain" />
+              <img src="./axiom-logo.png" alt="axiom." className="w-7 h-7 object-contain" />
               <span className="font-ndot text-sm tracking-[0.2em] text-axiom-white">
                 a<span className="text-axiom-red">x</span>i<span className="text-axiom-red">o</span>m<span className="text-axiom-red">.</span>
               </span>
