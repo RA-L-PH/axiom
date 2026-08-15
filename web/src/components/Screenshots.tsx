@@ -1,18 +1,28 @@
-import { motion } from 'framer-motion';
-import { FiExternalLink } from 'react-icons/fi';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiX } from 'react-icons/fi';
+
+const baseUrl = 'https://raw.githubusercontent.com/RA-L-PH/axiom/master/assets';
 
 const screenshots = [
-  { label: 'For You', color: '#D71921' },
-  { label: 'Songs', color: '#1A1A1A' },
-  { label: 'Albums', color: '#000000' },
-  { label: 'Album View', color: '#2A2A2A' },
-  { label: 'Search', color: '#1A1A1A' },
-  { label: 'Player', color: '#D71921' },
-  { label: 'Lyrics', color: '#000000' },
-  { label: 'Equalizer', color: '#2A2A2A' },
+  { label: 'For You', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.05%20(1).jpeg' },
+  { label: 'Songs', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.05.jpeg' },
+  { label: 'Albums', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.06%20(1).jpeg' },
+  { label: 'Album View', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.06.jpeg' },
+  { label: 'Search', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.07%20(1).jpeg' },
+  { label: 'Player', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.07%20(2).jpeg' },
+  { label: 'Lyrics', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.07.jpeg' },
+  { label: 'Queue', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.08%20(1).jpeg' },
+  { label: 'Equalizer', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.08%20(2).jpeg' },
+  { label: 'Options', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.08%20(3).jpeg' },
+  { label: 'Settings', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.08%20(4).jpeg' },
+  { label: 'Tags', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.08.jpeg' },
+  { label: 'Sleep Timer', file: 'WhatsApp%20Image%202026-08-15%20at%2013.51.09.jpeg' },
 ];
 
 export default function Screenshots() {
+  const [selected, setSelected] = useState<number | null>(null);
+
   return (
     <section id="screenshots" className="py-24 px-6 bg-axiom-gray">
       <div className="max-w-6xl mx-auto">
@@ -33,43 +43,59 @@ export default function Screenshots() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-axiom-border">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {screenshots.map((s, i) => (
             <motion.div
               key={s.label}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="group relative aspect-[9/16] bg-axiom-black overflow-hidden cursor-pointer"
+              transition={{ delay: i * 0.04 }}
+              onClick={() => setSelected(i)}
+              className="group relative bg-axiom-black border border-axiom-border overflow-hidden cursor-pointer hover:border-axiom-red transition-colors"
             >
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <div
-                  className="w-16 h-16 border border-axiom-border flex items-center justify-center"
-                  style={{ backgroundColor: s.color }}
-                >
-                  <span className="font-ntype-mono text-[10px] text-axiom-gray-muted">
-                    [{String(i + 1).padStart(2, '0')}]
-                  </span>
-                </div>
-                <span className="font-ndot text-[10px] tracking-widest uppercase text-axiom-gray-muted">
-                  {s.label}
-                </span>
+              <div className="aspect-[9/16]">
+                <img
+                  src={`${baseUrl}/${s.file}`}
+                  alt={s.label}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
-
-              <div className="absolute inset-0 bg-axiom-red/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <FiExternalLink size={20} className="text-axiom-red" />
-              </div>
-
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-axiom-red scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
             </motion.div>
           ))}
         </div>
-
-        <p className="mt-6 text-center font-ntype-mono text-[10px] tracking-widest text-axiom-gray-muted uppercase">
-          Screenshots from v0.1.2-beta.2 — placeholders until assets are added
-        </p>
       </div>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {selected !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelected(null)}
+            className="fixed inset-0 z-50 bg-axiom-black/95 flex items-center justify-center p-6 cursor-pointer"
+          >
+            <button
+              onClick={() => setSelected(null)}
+              className="absolute top-6 right-6 p-3 border border-axiom-border text-axiom-white hover:border-axiom-red hover:text-axiom-red transition-colors"
+            >
+              <FiX size={20} />
+            </button>
+            <motion.img
+              key={selected}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              src={`${baseUrl}/${screenshots[selected].file}`}
+              alt={screenshots[selected].label}
+              className="max-h-[85vh] max-w-[90vw] object-contain border border-axiom-border"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

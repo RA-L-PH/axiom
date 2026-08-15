@@ -31,7 +31,7 @@ export default function Hero() {
             <img src="/axiom-logo.png" alt="axiom." className="w-24 h-24 object-contain" />
           </motion.div>
 
-          <h1 className="mt-6 text-6xl md:text-8xl font-light tracking-tight text-axiom-white">
+          <h1 className="mt-6 text-6xl md:text-8xl font-ndot tracking-tight text-axiom-white">
             a<span className="text-axiom-red">x</span>i<span className="text-axiom-red">o</span>m<span className="text-axiom-red">.</span>
           </h1>
 
