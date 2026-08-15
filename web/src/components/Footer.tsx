@@ -1,0 +1,102 @@
+import { FiGithub, FiHeart, FiExternalLink } from 'react-icons/fi';
+
+const links = [
+  {
+    group: 'Project',
+    items: [
+      { label: 'Source Code', href: 'https://github.com/RA-L-PH/axiom' },
+      { label: 'Releases', href: 'https://github.com/RA-L-PH/axiom/releases' },
+      { label: 'Issues', href: 'https://github.com/RA-L-PH/axiom/issues' },
+      { label: 'Wiki', href: 'https://github.com/RA-L-PH/axiom/wiki' },
+    ],
+  },
+  {
+    group: 'Community',
+    items: [
+      { label: 'Telegram', href: 'https://t.me/rcdev' },
+      { label: 'Contributing', href: 'https://github.com/RA-L-PH/axiom/blob/master/CONTRIBUTING.md' },
+      { label: 'Translations', href: 'https://hosted.weblate.org/projects/axiom-music/' },
+      { label: 'Code of Conduct', href: 'https://github.com/RA-L-PH/axiom/blob/master/CODE_OF_CONDUCT.md' },
+    ],
+  },
+  {
+    group: 'Credits',
+    items: [
+      { label: 'BoomingMusic', href: 'https://github.com/mardous/BoomingMusic' },
+      { label: 'Retro Music Player', href: 'https://github.com/RetroMusicPlayer/RetroMusicPlayer' },
+      { label: 'LRCLib', href: 'https://lrclib.net/' },
+      { label: 'License (GPL-3.0)', href: 'https://github.com/RA-L-PH/axiom/blob/master/LICENSE.txt' },
+    ],
+  },
+];
+
+export default function Footer() {
+  return (
+    <footer className="border-t border-axiom-border">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="py-16 grid grid-cols-2 md:grid-cols-4 gap-12">
+          <div className="col-span-2 md:col-span-1">
+            <div className="flex items-center gap-3 mb-4">
+              <img src="/axiom-logo.png" alt="axiom." className="w-7 h-7 object-contain" />
+              <span className="font-ndot text-sm tracking-[0.2em] text-axiom-white">
+                a<span className="text-axiom-red">x</span>i<span className="text-axiom-red">o</span>m<span className="text-axiom-red">.</span>
+              </span>
+            </div>
+            <p className="text-sm text-axiom-gray-muted leading-relaxed font-space">
+              Modern design. Pure sound. Fully yours.
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              <a
+                href="https://github.com/RA-L-PH/axiom"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 border border-axiom-border text-axiom-gray-muted hover:text-axiom-white hover:border-axiom-white transition-colors"
+              >
+                <FiGithub size={14} />
+              </a>
+              <a
+                href="https://t.me/rcdev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 border border-axiom-border text-axiom-gray-muted hover:text-axiom-red hover:border-axiom-red transition-colors"
+              >
+                <FiExternalLink size={14} />
+              </a>
+            </div>
+          </div>
+
+          {links.map((group) => (
+            <div key={group.group}>
+              <h4 className="font-ndot text-[10px] tracking-[0.2em] uppercase text-axiom-red mb-4">
+                {group.group}
+              </h4>
+              <ul className="space-y-2">
+                {group.items.map((item) => (
+                  <li key={item.label}>
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-ntype-mono text-xs text-axiom-gray-muted hover:text-axiom-white transition-colors"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="py-6 border-t border-axiom-border flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="font-ntype-mono text-[10px] tracking-[0.15em] text-axiom-gray-muted">
+            &copy; 2026 RA-L-PH. Licensed under GPL-3.0.
+          </p>
+          <p className="font-ntype-mono text-[10px] tracking-[0.15em] text-axiom-gray-muted flex items-center gap-1.5">
+            Built with <FiHeart size={10} className="text-axiom-red" /> and Kotlin
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}

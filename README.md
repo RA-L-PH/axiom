@@ -6,19 +6,6 @@
 
 ### Modern design. Pure sound. Fully yours.
 
-[![Latest Release](https://img.shields.io/github/v/release/rc/Axiom?style=for-the-badge&label=Release&logo=github)](https://github.com/rc/Axiom/releases/latest)
-[![F-Droid version](https://img.shields.io/f-droid/v/com.rc.axiom?style=for-the-badge&label=F-Droid&logo=fdroid)](https://f-droid.org/packages/com.rc.axiom/)
-[![Downloads](https://img.shields.io/github/downloads/rc/Axiom/total?style=for-the-badge&logo=github&label=Downloads)](https://github.com/rc/Axiom/releases)
-[![License: GPL v3](https://img.shields.io/github/license/rc/Axiom?style=for-the-badge&color=orange&label=License&logo=gnu)](LICENSE.txt)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor_Covenant-2.1-4baaaa.svg?style=for-the-badge&logo=contributorcovenant)](CODE_OF_CONDUCT.md)
-[![Telegram Channel](https://img.shields.io/badge/Telegram-Join_Chat-blue?style=for-the-badge&logo=telegram)](https://t.me/rcdev)
-
-<a href="https://github.com/rc/Axiom/releases"><img src="assets/badge-github.png" height="60" alt="GitHub Release"></a>
-<a href="https://f-droid.org/packages/com.rc.axiom/"><img src="assets/badge-fdroid.png" height="60" alt="F-Droid"></a>
-<a href="https://apt.izzysoft.de/packages/com.rc.axiom/"><img src="assets/badge-izzyondroid.png" height="60" alt="IzzyOnDroid"></a>
-<a href="https://www.openapk.net/axiommusic/com.rc.axiom/"><img src="assets/badge-openapk.png" height="60" alt="OpenAPK"></a>
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/rc/Axiom/"><img src="assets/badge-obtainium.png" height="60" alt="Obtainium"></a>
-
 </div>
 
 ## 🗂️ Table of Contents

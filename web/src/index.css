@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Ndot55';
+  src: url('/fonts/Ndot55-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NType82';
+  src: url('/fonts/NType82-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NType82Mono';
+  src: url('/fonts/NType82Mono-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SpaceGrotesk';
+  src: url('/fonts/SpaceGrotesk-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SpaceMono';
+  src: url('/fonts/SpaceMono-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-axiom-black: #000000;
+  --color-axiom-white: #FFFFFF;
+  --color-axiom-red: #D71921;
+  --color-axiom-red-dark: #B0141B;
+  --color-axiom-gray: #1A1A1A;
+  --color-axiom-gray-light: #2A2A2A;
+  --color-axiom-gray-muted: #585A5A;
+  --color-axiom-border: #333333;
+
+  --font-ndot: 'Ndot55', sans-serif;
+  --font-ntype: 'NType82', sans-serif;
+  --font-ntype-mono: 'NType82Mono', monospace;
+  --font-space: 'SpaceGrotesk', sans-serif;
+  --font-space-mono: 'SpaceMono', monospace;
+  --font-mono: 'SpaceMono', 'NType82Mono', ui-monospace, monospace;
+  --font-sans: 'SpaceGrotesk', 'NType82', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #000000;
+  color: #FFFFFF;
+  font-family: 'SpaceGrotesk', 'NType82', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: #D71921;
+  color: #FFFFFF;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D71921;
+}
