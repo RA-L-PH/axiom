@@ -42,8 +42,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.postDelayed
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import coil3.load
@@ -187,19 +191,104 @@ abstract class AbsPlayerFragment(@LayoutRes layoutRes: Int) : Fragment(layoutRes
                 view.inflateMenu(R.menu.menu_now_playing, this) {
                     onMenuInflated(it)
                 }
+                val toolbarActions = setOf(
+                    R.id.action_favorite,
+                    R.id.action_playing_queue,
+                    R.id.action_sleep_timer,
+                    R.id.action_show_lyrics,
+                    R.id.action_more
+                )
+                for (i in 0 until view.menu.size()) {
+                    val item = view.menu.getItem(i)
+                    if (item.itemId != R.id.action_more) {
+                        if (item.itemId in toolbarActions && item.isVisible) {
+                            // keep visible
+                        } else {
+                            item.isVisible = false
+                        }
+                    }
+                }
+                view.setOnMenuItemClickListener { menuItem ->
+                    if (menuItem.itemId == R.id.action_more) {
+                        showMoreGridDialog(view.menu, toolbarActions)
+                        true
+                    } else {
+                        onMenuItemClick(menuItem)
+                    }
+                }
             } else {
                 val popupMenu = newPopupMenu(view, R.menu.menu_now_playing) {
                     onMenuInflated(it)
-                }.also { popupMenu ->
-                    popupMenu.setOnMenuItemClickListener { onMenuItemClick(it) }
                 }
                 view.setOnClickListener {
-                    popupMenu.show()
+                    showMoreGridDialog(popupMenu.menu, emptySet())
                 }
                 return popupMenu
             }
         }
         return null
+    }
+
+    private fun showMoreGridDialog(menu: Menu, toolbarActions: Set<Int>) {
+        val context = requireContext()
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_more_grid, null)
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recycler_view)
+        val items = mutableListOf<MenuItem>()
+        for (i in 0 until menu.size()) {
+            val item = menu.getItem(i)
+            if (item.itemId == R.id.action_more) continue
+            if (item.hasSubMenu()) {
+                val subMenu = item.subMenu
+                if (subMenu != null) {
+                    for (j in 0 until subMenu.size()) {
+                        val subItem = subMenu.getItem(j)
+                        if (subItem.itemId !in toolbarActions) {
+                            items.add(subItem)
+                        }
+                    }
+                }
+            } else {
+                if (item.itemId !in toolbarActions) {
+                    items.add(item)
+                }
+            }
+        }
+        for (item in items) {
+            if (item.icon == null) {
+                val iconRes = when (item.itemId) {
+                    R.id.action_go_to_album -> R.drawable.ic_album_24dp
+                    R.id.action_go_to_artist -> R.drawable.ic_person_24dp
+                    R.id.action_go_to_genre -> R.drawable.ic_library_music_24dp
+                    else -> null
+                }
+                if (iconRes != null) {
+                    item.icon = AppCompatResources.getDrawable(context, iconRes)
+                }
+            }
+        }
+        val dialog = MaterialAlertDialogBuilder(context)
+            .setView(dialogView)
+            .create()
+        recyclerView.layoutManager = GridLayoutManager(context, 4)
+        recyclerView.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+                val itemView = LayoutInflater.from(context).inflate(R.layout.item_more_grid, parent, false)
+                return object : RecyclerView.ViewHolder(itemView) {}
+            }
+            override fun getItemCount(): Int = items.size
+            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+                val item = items[position]
+                val iconView = holder.itemView.findViewById<ImageView>(R.id.icon)
+                val labelView = holder.itemView.findViewById<TextView>(R.id.label)
+                iconView.setImageDrawable(item.icon)
+                labelView.text = item.title
+                holder.itemView.setOnClickListener {
+                    dialog.dismiss()
+                    onMenuItemClick(item)
+                }
+            }
+        }
+        dialog.show()
     }
 
     @CallSuper

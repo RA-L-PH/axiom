@@ -943,6 +943,7 @@
     <string name="m3_style">M3</string>
     <string name="expressive_style">Expressive</string>
     <string name="normal_style">Normal</string>
+    <string name="reels_style">Reels</string>
     <string name="cascading">Cascading</string>
     <string name="depth">Depth</string>
     <string name="hinge">Hinge</string>

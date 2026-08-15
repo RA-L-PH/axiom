@@ -8,8 +8,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     app:cardCornerRadius="0dp"
-    app:strokeColor="#FFFFFF"
-    app:strokeWidth="1.5dp"
+    app:strokeColor="@android:color/transparent"
+    app:strokeWidth="0dp"
     app:cardElevation="0dp"
     tools:ignore="PrivateResource">
 

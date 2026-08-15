@@ -67,6 +67,8 @@ sealed class NetworkFeature(
         object Wikipedia : Services(WIKIPEDIA_ENABLED_KEY, true)
         object MusicBrainz : Services(MUSICBRAINZ_ENABLED_KEY, true)
         object AudioDb : Services(AUDIODB_ENABLED_KEY, true)
+        object YtMusic : Services(YTMUSIC_ENABLED_KEY, true)
+        object Genius : Services(GENIUS_ENABLED_KEY, true)
     }
 
     sealed class ListenBrainz(preferenceKey: String, isOnByDefault: Boolean) :
@@ -117,6 +119,8 @@ sealed class NetworkFeature(
         const val WIKIPEDIA_ENABLED_KEY = "wikipedia_enabled"
         const val MUSICBRAINZ_ENABLED_KEY = "musicbrainz_enabled"
         const val AUDIODB_ENABLED_KEY = "audiodb_enabled"
+        const val YTMUSIC_ENABLED_KEY = "ytmusic_enabled"
+        const val GENIUS_ENABLED_KEY = "genius_enabled"
 
         fun isOnline(ignoreWifiSetting: Boolean = false): Boolean {
             val context = get<Context>()

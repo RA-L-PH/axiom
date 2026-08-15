@@ -1,8 +1,10 @@
 package com.rc.axiom.ui.component.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rc.axiom.ui.theme.LetteraMonoLL
 
 object EmptyViewDefaults {
     val IconSize = 48.dp
@@ -48,6 +51,7 @@ data class EmptyViewColors(
     val textColor: Color
 )
 
+
 @Composable
 fun EmptyView(
     icon: Painter,
@@ -58,45 +62,25 @@ fun EmptyView(
     iconSize: Dp = EmptyViewDefaults.IconSize,
     button: @Composable () -> Unit = {}
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(32.dp)
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.fillMaxSize().background(Color.Black)
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .clip(CircleShape)
-                .background(colors.iconContainerColor)
-                .padding(32.dp)
+                .size(width = 200.dp, height = 48.dp)
+                .background(Color.Black)
+                .border(1.dp, Color(0xFFD71921))
         ) {
-            Icon(
-                painter = icon,
-                contentDescription = null,
-                tint = colors.iconColor,
-                modifier = Modifier.size(iconSize)
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Text(
-            text = title,
-            textAlign = TextAlign.Center,
-            color = colors.titleColor,
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        if (!subtitle.isNullOrEmpty()) {
             Text(
-                text = subtitle,
-                textAlign = TextAlign.Center,
-                color = colors.textColor,
-                style = MaterialTheme.typography.bodyMedium
+                text = "[ NULL_RESPONSE ]",
+                color = Color(0xFFD71921),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 12.sp,
+                    fontFamily = LetteraMonoLL
+                )
             )
         }
-
-        Spacer(Modifier.height(16.dp))
-
-        button()
     }
 }

@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rc.axiom.R
@@ -41,8 +43,8 @@ fun MaterialSwitch(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.extraLarge)
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(Color.Black)
+            .border(1.dp, Color.White)
             .toggleable(
                 value = isChecked,
                 enabled = enabled,
@@ -60,7 +62,7 @@ fun MaterialSwitch(
                 modifier = Modifier
                     .padding(start = 8.dp, end = 16.dp)
                     .size(24.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                tint = Color.White,
             )
         }
         Column(
@@ -73,14 +75,14 @@ fun MaterialSwitch(
                 text = title,
                 maxLines = 2,
                 style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = Color.White,
             )
             subtitle?.let {
                 Text(
                     text = it,
                     maxLines = 2,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = .6f),
+                    color = Color.White.copy(alpha = .6f),
                 )
             }
         }

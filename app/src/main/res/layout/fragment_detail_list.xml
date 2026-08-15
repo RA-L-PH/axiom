@@ -11,6 +11,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:liftOnScroll="false"
         android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -19,6 +20,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:expandedTitleTextColor="@android:color/transparent"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.Axiom.Toolbar.Title"
+            app:contentScrim="?attr/colorSurface"
+            app:statusBarScrim="?attr/colorSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -95,6 +99,7 @@
                         android:singleLine="true"
                         android:paddingVertical="16dp"
                         android:text="@string/action_play"
+                        app:cornerRadius="0dp"
                         app:icon="@drawable/ic_play_24dp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -106,6 +111,7 @@
                         android:singleLine="true"
                         android:paddingVertical="16dp"
                         android:text="@string/shuffle_action"
+                        app:cornerRadius="0dp"
                         app:icon="@drawable/ic_shuffle_24dp" />
 
                 </com.google.android.material.button.MaterialButtonGroup>

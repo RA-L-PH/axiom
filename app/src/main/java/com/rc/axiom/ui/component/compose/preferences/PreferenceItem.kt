@@ -101,19 +101,9 @@ fun SwitchPreferenceItem(
             }
         },
         trailingContent = {
-            Switch(
+            com.rc.axiom.ui.component.compose.CustomSquareToggle(
                 checked = checked,
-                enabled = enabled,
-                thumbContent = {
-                    if (checked) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_check_24dp),
-                            contentDescription = null,
-                            modifier = Modifier.size(SwitchDefaults.IconSize)
-                        )
-                    }
-                },
-                onCheckedChange = onCheckedChanged
+                modifier = Modifier.padding(start = 12.dp, end = 6.dp)
             )
         },
         modifier = modifier,

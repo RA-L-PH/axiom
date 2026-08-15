@@ -93,30 +93,35 @@
                     android:id="@+id/modeSongs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/letteramonoll"
                     android:text="@string/songs_label" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/modeAlbums"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/letteramonoll"
                     android:text="@string/albums_label" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/modeArtists"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/letteramonoll"
                     android:text="@string/artists_label" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/modeGenres"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/letteramonoll"
                     android:text="@string/genres_label" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/modePlaylists"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/letteramonoll"
                     android:text="@string/playlists_label" />
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
@@ -147,6 +152,7 @@
         android:text="@string/no_results"
         android:textAlignment="gravity"
         android:textAppearance="?textAppearanceHeadline6"
+        android:fontFamily="@font/letteramonoll"
         android:visibility="gone"
         tools:visibility="visible" />
 
@@ -157,6 +163,8 @@
         android:layout_gravity="end|bottom"
         android:layout_marginEnd="@dimen/fab_margin_top_left_right"
         android:text="@string/keyboard"
+        android:fontFamily="@font/ndot57"
+        app:shapeAppearanceOverlay="@style/SquareShapeAppearance"
         app:icon="@drawable/ic_keyboard_24dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -87,6 +87,7 @@ import com.rc.axiom.ui.screen.lyrics.LyricsViewModel
 import com.rc.axiom.ui.screen.other.MiniPlayerFragment
 import com.rc.axiom.ui.screen.permissions.PermissionsActivity
 import com.rc.axiom.ui.screen.player.PlayerViewModel
+import com.rc.axiom.ui.screen.player.styles.reelsstyle.ReelsPlayerFragment
 import com.rc.axiom.ui.screen.player.styles.defaultstyle.DefaultPlayerFragment
 import com.rc.axiom.ui.screen.player.styles.expressivestyle.ExpressivePlayerFragment
 import com.rc.axiom.ui.screen.player.styles.fullcoverstyle.FullCoverPlayerFragment
@@ -501,7 +502,8 @@ abstract class AbsSlidingMusicPanelActivity : AbsBaseActivity(),
                     setLightStatusBar(isColorLight)
                     setLightNavigationBar(isColorLight)
                 }
-                NowPlayingScreen.FullCover -> {
+                NowPlayingScreen.FullCover,
+                NowPlayingScreen.Reels -> {
                     setLightNavigationBar(isColorLight)
                     setLightStatusBar(false)
                 }
@@ -592,17 +594,9 @@ abstract class AbsSlidingMusicPanelActivity : AbsBaseActivity(),
     }
 
     private fun chooseFragmentForTheme() {
-        nowPlayingScreen = Preferences.nowPlayingScreen
+        nowPlayingScreen = NowPlayingScreen.Reels
 
-        val fragment: AbsPlayerFragment = when (nowPlayingScreen) {
-            NowPlayingScreen.FullCover -> FullCoverPlayerFragment()
-            NowPlayingScreen.Gradient -> GradientPlayerFragment()
-            NowPlayingScreen.Peek -> PeekPlayerFragment()
-            NowPlayingScreen.Plain -> PlainPlayerFragment()
-            NowPlayingScreen.M3 -> M3PlayerFragment()
-            NowPlayingScreen.Expressive -> ExpressivePlayerFragment()
-            else -> DefaultPlayerFragment()
-        }
+        val fragment: AbsPlayerFragment = ReelsPlayerFragment()
 
         supportFragmentManager.commit {
             replace(R.id.player_container, fragment)

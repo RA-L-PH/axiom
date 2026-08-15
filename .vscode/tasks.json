@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Android Mirror Device (Scrcpy)",
+            "type": "shell",
+            "command": "scrcpy",
+            "args": [
+                "--always-on-top",
+                "--window-title",
+                "Antigravity Live View - Axiom"
+            ],
+            "problemMatcher": [],
+            "group": "none",
+            "detail": "Mirrors the connected Android device screen."
+        },
+        {
+            "label": "Android Live Reload Watcher",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/live-reload.ps1"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Watches layouts/code changes and auto-deploys to device."
+        }
+    ]
+}

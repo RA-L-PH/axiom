@@ -83,10 +83,31 @@ class TopAppBarLayout @JvmOverloads constructor(
             simpleAppbarBinding?.toolbar?.title.toString()
         }
         set(value) {
-            if (mode == AppBarMode.COLLAPSING) {
-                collapsingAppbarBinding?.collapsingToolbarLayout?.title = value
+            val titleStr = value.toString()
+            val formattedValue: CharSequence = if (titleStr.equals("axiom", ignoreCase = true) || titleStr.equals("axiom.", ignoreCase = true)) {
+                val builder = android.text.SpannableStringBuilder("axiom.")
+                for (i in 0 until builder.length) {
+                    val char = builder[i].lowercaseChar()
+                    if (char == 'x' || char == 'o') {
+                        builder.setSpan(
+                            android.text.style.ForegroundColorSpan(android.graphics.Color.RED),
+                            i,
+                            i + 1,
+                            android.text.SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
+                }
+                builder
+            } else if (value is android.text.Spanned) {
+                value
             } else {
-                simpleAppbarBinding?.toolbar?.title = value
+                titleStr.uppercase()
+            }
+
+            if (mode == AppBarMode.COLLAPSING) {
+                collapsingAppbarBinding?.collapsingToolbarLayout?.title = formattedValue
+            } else {
+                simpleAppbarBinding?.toolbar?.title = formattedValue
             }
         }
 

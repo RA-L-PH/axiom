@@ -110,6 +110,55 @@
             app:widgetLayout="@layout/preference_switch"
             app:key="musicbrainz_enabled"/>
 
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_language_24dp"
+            app:title="YouTube Music Integration"
+            app:summary="Fetch artist images and album artwork from YouTube Music via InnerTube"
+            app:defaultValue="true"
+            app:layout="@layout/list_item_view"
+            app:widgetLayout="@layout/preference_switch"
+            app:key="ytmusic_enabled"/>
+
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_language_24dp"
+            app:title="Genius Integration"
+            app:summary="Fetch artist images, album covers, track info and biographies from Genius API"
+            app:defaultValue="true"
+            app:layout="@layout/list_item_view"
+            app:widgetLayout="@layout/preference_switch"
+            app:key="genius_enabled"/>
+
+        <EditTextPreference
+            app:iconSpaceReserved="true"
+            app:title="Genius Client ID"
+            app:useSimpleSummaryProvider="true"
+            app:layout="@layout/list_item_view"
+            app:dependency="genius_enabled"
+            app:key="genius_client_id"/>
+
+        <EditTextPreference
+            app:iconSpaceReserved="true"
+            app:title="Genius Client Secret"
+            app:useSimpleSummaryProvider="true"
+            app:layout="@layout/list_item_view"
+            app:dependency="genius_enabled"
+            app:key="genius_client_secret"/>
+
+        <EditTextPreference
+            app:iconSpaceReserved="true"
+            app:title="Genius Client Access Token"
+            app:useSimpleSummaryProvider="true"
+            app:layout="@layout/list_item_view"
+            app:dependency="genius_enabled"
+            app:key="genius_access_token"/>
+
+        <com.rc.axiom.ui.component.preferences.CustomDialogPreference
+            app:icon="@drawable/ic_person_24dp"
+            app:title="@string/lastfm_login_title"
+            app:summary="@string/lastfm_login_summary"
+            app:layout="@layout/list_item_view"
+            app:key="lastfm_login"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

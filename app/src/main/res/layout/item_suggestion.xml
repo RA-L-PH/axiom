@@ -9,10 +9,10 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/heading_title"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:paddingEnd="8dp"
         android:singleLine="true"
         android:ellipsize="marquee"
         android:gravity="start|center_vertical"
@@ -23,22 +23,20 @@
         android:fontFamily="@font/ndot57"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/open"
-        tools:text="@string/last_added_label"/>
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/open"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:text=">"
         android:textColor="#D71921"
         android:textSize="24sp"
         android:fontFamily="@font/ndot57"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="@+id/heading_title"
+        app:layout_constraintStart_toEndOf="@+id/heading_title"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

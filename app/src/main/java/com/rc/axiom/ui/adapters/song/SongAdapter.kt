@@ -73,6 +73,8 @@ open class SongAdapter(
             notifyDataSetChanged()
         }
 
+    var useMonoFont: Boolean = false
+
     var currentSongId: Long = -1L
         set(value) {
             if (field != value) {
@@ -100,6 +102,16 @@ open class SongAdapter(
         holder.menu?.isGone = isChecked
         holder.title?.text = getSongTitle(song)
         holder.text?.text = getSongText(song)
+
+        val context = holder.itemView.context
+        if (useMonoFont) {
+            val typeface = androidx.core.content.res.ResourcesCompat.getFont(context, R.font.letteramonoll)
+            holder.title?.typeface = typeface
+            holder.text?.typeface = typeface
+        } else {
+            holder.title?.typeface = androidx.core.content.res.ResourcesCompat.getFont(context, R.font.ndot57)
+            holder.text?.typeface = androidx.core.content.res.ResourcesCompat.getFont(context, R.font.letteramonoll)
+        }
         
         val isCurrentSong = song.id == currentSongId
         val redColor = 0xFFD71921.toInt()

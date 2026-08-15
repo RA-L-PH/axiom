@@ -1,11 +1,13 @@
 package com.rc.axiom.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import com.rc.axiom.R
 import com.rc.axiom.core.model.player.PlayerColorScheme
 
@@ -85,6 +87,15 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+
+private val flatShapes = Shapes(
+    extraSmall = RoundedCornerShape(0.dp),
+    small = RoundedCornerShape(0.dp),
+    medium = RoundedCornerShape(0.dp),
+    large = RoundedCornerShape(0.dp),
+    extraLarge = RoundedCornerShape(0.dp)
+)
+
 @Composable
 fun AxiomTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -103,6 +114,7 @@ fun AxiomTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = customTypography,
+        shapes = flatShapes,
         content = content
     )
 }
@@ -131,6 +143,7 @@ fun PlayerTheme(
     MaterialTheme(
         colorScheme = scheme,
         typography = customTypography,
+        shapes = flatShapes,
         content = content
     )
 }

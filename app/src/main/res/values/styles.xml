@@ -126,8 +126,7 @@
     </style>
 
     <style name="CircularShapeAppearance" parent="">
-        <item name="cornerSize">50%</item>
-        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
     </style>
 
     <style name="SquareShapeAppearance" parent="">
@@ -145,6 +144,11 @@
 
     <style name="SquigglySlider" parent="Base.SquigglySlider">
         <item name="android:progressDrawable">@drawable/media_squiggly_progress</item>
+    </style>
+
+    <style name="SideSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_right</item>
     </style>
 
 </resources>

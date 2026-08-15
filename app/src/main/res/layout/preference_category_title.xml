@@ -14,5 +14,6 @@
         android:textAppearance="?textAppearanceOverline"
         android:fontFamily="@font/ndot57"
         android:textColor="?colorPrimary"
+        android:textAllCaps="true"
         tools:text="@tools:sample/full_names" />
 </LinearLayout>

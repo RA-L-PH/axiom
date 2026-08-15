@@ -163,7 +163,7 @@ class MainActivity : AbsSlidingMusicPanelActivity(), MediaController.Listener {
                         saveTab(destination.id)
                     }
                     // Show Bottom Navigation Bar
-                    setBottomNavVisibility(visible = true, animate = true)
+                    setBottomNavVisibility(visible = true, animate = false)
                 }
 
                 R.id.nav_queue,
@@ -173,7 +173,7 @@ class MainActivity : AbsSlidingMusicPanelActivity(), MediaController.Listener {
                     setBottomNavVisibility(visible = false, hideBottomSheet = true)
                 }
 
-                else -> setBottomNavVisibility(visible = false, animate = true) // Hide Bottom Navigation Bar
+                else -> setBottomNavVisibility(visible = false, animate = false) // Hide Bottom Navigation Bar
             }
         }
     }

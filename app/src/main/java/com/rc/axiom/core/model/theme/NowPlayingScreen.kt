@@ -107,13 +107,23 @@ enum class NowPlayingScreen(
         supportsCarouselEffect = false,
         supportsCustomCornerRadius = false,
         supportsSmallImage = false
+    ),
+    Reels(
+        R.string.reels_style,
+        R.drawable.np_full,
+        R.layout.fragment_album_cover,
+        buttonStyle = NowPlayingButtonStyle.Normal,
+        supportsCoverLyrics = true,
+        supportsCarouselEffect = false,
+        supportsCustomCornerRadius = false,
+        supportsSmallImage = false
     );
 
     val defaultColorScheme: PlayerColorSchemeMode
         get() = when (this) {
             Default, Plain, Peek -> PlayerColorSchemeMode.AppTheme
             M3 -> PlayerColorSchemeMode.MaterialYou
-            Expressive -> PlayerColorSchemeMode.Blur
+            Expressive, Reels -> PlayerColorSchemeMode.Blur
             FullCover, Gradient -> PlayerColorSchemeMode.VibrantColor
         }
 
@@ -141,7 +151,8 @@ enum class NowPlayingScreen(
                 PlayerColorSchemeMode.MaterialYou,
                 PlayerColorSchemeMode.Blur
             )
-            Expressive -> listOf(
+            Expressive,
+            Reels -> listOf(
                 PlayerColorSchemeMode.AppTheme,
                 PlayerColorSchemeMode.MaterialYou,
                 PlayerColorSchemeMode.Blur
@@ -151,7 +162,8 @@ enum class NowPlayingScreen(
     val defaultTransition: PlayerTransition
         get() = when (this) {
             FullCover,
-            Gradient -> PlayerTransition.Parallax
+            Gradient,
+            Reels -> PlayerTransition.Parallax
             else -> PlayerTransition.Simple
         }
 
@@ -171,7 +183,8 @@ enum class NowPlayingScreen(
                 PlayerTransition.Hinge
             )
             FullCover,
-            Gradient -> listOf(
+            Gradient,
+            Reels -> listOf(
                 PlayerTransition.Simple,
                 PlayerTransition.Cascading,
                 PlayerTransition.Depth,

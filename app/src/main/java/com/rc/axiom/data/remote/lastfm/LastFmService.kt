@@ -42,7 +42,10 @@ import io.ktor.http.encodeURLParameter
 import io.ktor.http.userAgent
 import kotlinx.serialization.json.Json
 
-class LastFmService(private val client: HttpClient) {
+class LastFmService(
+    private val client: HttpClient,
+    private val preferences: android.content.SharedPreferences
+) {
 
     private val json = Json {
         isLenient = true
@@ -56,11 +59,15 @@ class LastFmService(private val client: HttpClient) {
             url.encodedParameters.append("artist", artistName.encodeURLParameter())
         }.body<LastFmAlbum>()
 
-    suspend fun artistInfo(artistName: String, language: String?, cacheControl: String?) =
+    suspend fun artistInfo(artistName: String?, language: String?, cacheControl: String?, mbid: String? = null) =
         client.lastfm("artist.getInfo") {
             parameter("lang", language)
             header(HttpHeaders.CacheControl, cacheControl)
-            url.encodedParameters.append("artist", artistName.encodeURLParameter())
+            if (!mbid.isNullOrBlank()) {
+                parameter("mbid", mbid)
+            } else if (artistName != null) {
+                url.encodedParameters.append("artist", artistName.encodeURLParameter())
+            }
         }.body<LastFmArtist>()
 
     suspend fun userInfo(username: String) =
@@ -118,12 +125,18 @@ class LastFmService(private val client: HttpClient) {
         return json.decodeFromString<NowPlayingResponse>(response)
     }
 
+    private val apiKey: String
+        get() = preferences.getString("lastfm_api_key", null)?.takeIf { it.isNotBlank() } ?: BuildConfig.LASTFM_API_KEY
+
+    private val apiSecret: String
+        get() = preferences.getString("lastfm_api_secret", null)?.takeIf { it.isNotBlank() } ?: BuildConfig.LASTFM_SECRET
+
     private suspend fun HttpClient.lastfm(method: String, block: HttpRequestBuilder.() -> Unit) =
         get(LASTFM_API_URL) {
             userAgent(USER_AGENT)
             parameter("format", "json")
             parameter("autocorrect", 1)
-            parameter("api_key", API_KEY)
+            parameter("api_key", apiKey)
             parameter("method", method)
             block()
         }
@@ -133,7 +146,7 @@ class LastFmService(private val client: HttpClient) {
         params: Map<String, String>
     ): String {
         val allParams = params.toMutableMap().apply {
-            put("api_key", API_KEY)
+            put("api_key", apiKey)
             put("method", method)
         }
         val apiSig = generateSignature(allParams)
@@ -152,12 +165,7 @@ class LastFmService(private val client: HttpClient) {
 
     private fun generateSignature(params: Map<String, String>): String {
         val sortedParams = params.toSortedMap()
-        val signatureBase = sortedParams.entries.joinToString("") { "${it.key}${it.value}" } + API_SECRET
+        val signatureBase = sortedParams.entries.joinToString("") { "${it.key}${it.value}" } + apiSecret
         return signatureBase.encodeMd5()
-    }
-
-    companion object {
-        private const val API_KEY = BuildConfig.LASTFM_API_KEY
-        private const val API_SECRET = BuildConfig.LASTFM_SECRET
     }
 }

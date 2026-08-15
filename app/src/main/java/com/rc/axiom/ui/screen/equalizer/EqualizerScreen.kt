@@ -1318,60 +1318,62 @@ private fun ProfileCheckDialog(
             .apply { addAll(profiles.filterNot { it.isCustom }) }
     }
 
-    AlertDialog(
-        icon = {
-            Icon(
-                painter = icon,
-                contentDescription = null
-            )
-        },
-        title = { Text(title) },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.bodyMedium
+    MaterialTheme(typography = com.rc.axiom.ui.theme.monoTypography) {
+        AlertDialog(
+            icon = {
+                Icon(
+                    painter = icon,
+                    contentDescription = null
                 )
+            },
+            title = { Text(title) },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
 
-                LazyColumn {
-                    items(profiles) { profile ->
-                        if (profile.isCustom.not()) {
-                            val isChecked = selectedProfiles.contains(profile)
-                            DialogListItemWithCheckBox(
-                                title = profile.name,
-                                onClick = {
-                                    if (isChecked) {
-                                        selectedProfiles.remove(profile)
-                                    } else {
-                                        selectedProfiles.add(profile)
-                                    }
-                                },
-                                isSelected = isChecked,
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
-                                modifier = Modifier.clip(RoundedCornerShape(8.dp))
-                            )
+                    LazyColumn {
+                        items(profiles) { profile ->
+                            if (profile.isCustom.not()) {
+                                val isChecked = selectedProfiles.contains(profile)
+                                DialogListItemWithCheckBox(
+                                    title = profile.name,
+                                    onClick = {
+                                        if (isChecked) {
+                                            selectedProfiles.remove(profile)
+                                        } else {
+                                            selectedProfiles.add(profile)
+                                        }
+                                    },
+                                    isSelected = isChecked,
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
+                                    modifier = Modifier.clip(RoundedCornerShape(8.dp))
+                                )
+                            }
                         }
                     }
                 }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(selectedProfiles) },
-                enabled = selectedProfiles.isNotEmpty()
-            ) {
-                Text(confirmButton)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
-        },
-        onDismissRequest = onDismiss
-    )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onConfirm(selectedProfiles) },
+                    enabled = selectedProfiles.isNotEmpty()
+                ) {
+                    Text(confirmButton)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+            onDismissRequest = onDismiss
+        )
+    }
 }
 
 @Composable
@@ -1554,51 +1556,53 @@ private fun EngineSelectorDialog(
 ) {
     var selectedMode by remember { mutableStateOf(currentEngine) }
 
-    AlertDialog(
-        icon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_equalizer_24dp),
-                contentDescription = null
-            )
-        },
-        title = { Text(stringResource(R.string.set_eq_engine_title)) },
-        text = {
-            LazyColumn {
-                items(EqEngineMode.entries) { mode ->
-                    DialogListItemWithRadio(
-                        onClick = { selectedMode = mode },
-                        isSelected = mode == selectedMode,
-                        title = stringResource(mode.titleRes),
-                        subtitle = stringResource(mode.descriptionRes),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
-                        modifier = Modifier.clip(RoundedCornerShape(8.dp))
-                    )
-                }
+    MaterialTheme(typography = com.rc.axiom.ui.theme.monoTypography) {
+        AlertDialog(
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_equalizer_24dp),
+                    contentDescription = null
+                )
+            },
+            title = { Text(stringResource(R.string.set_eq_engine_title)) },
+            text = {
+                LazyColumn {
+                    items(EqEngineMode.entries) { mode ->
+                        DialogListItemWithRadio(
+                            onClick = { selectedMode = mode },
+                            isSelected = mode == selectedMode,
+                            title = stringResource(mode.titleRes),
+                            subtitle = stringResource(mode.descriptionRes),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
+                            modifier = Modifier.clip(RoundedCornerShape(8.dp))
+                        )
+                    }
 
-                item {
-                    Spacer(Modifier.height(16.dp))
-                }
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                    }
 
-                item {
-                    TipView(
-                        text = stringResource(R.string.set_eq_engine_reset_warning),
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
+                    item {
+                        TipView(
+                            text = stringResource(R.string.set_eq_engine_reset_warning),
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    }
                 }
-            }
-        },
-        confirmButton = {
-            Button(onClick = { onConfirm(selectedMode) }) {
-                Text(stringResource(android.R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
-        },
-        onDismissRequest = onDismiss
-    )
+            },
+            confirmButton = {
+                Button(onClick = { onConfirm(selectedMode) }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+            onDismissRequest = onDismiss
+        )
+    }
 }
 
 @Composable

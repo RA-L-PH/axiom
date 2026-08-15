@@ -24,7 +24,7 @@
             android:scaleType="centerCrop"
             app:shapeAppearanceOverlay="@style/SquareShapeAppearance"
             app:strokeColor="#FFFFFF"
-            app:strokeWidth="1dp"
+            app:strokeWidth="0dp"
             tools:srcCompat="@tools:sample/backgrounds/scenic[16]"/>
 
     </FrameLayout>

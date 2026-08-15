@@ -45,6 +45,7 @@
             android:textAlignment="center"
             android:textAppearance="?textAppearanceHeadline5"
             android:textColor="?android:attr/textColorSecondary"
+            android:fontFamily="@font/letteramonoll"
             tools:visibility="visible"/>
 
     </LinearLayout>
@@ -56,6 +57,12 @@
         android:layout_gravity="bottom|end"
         android:layout_marginHorizontal="16dp"
         android:contentDescription="@string/shuffle_all_label"
-        app:srcCompat="@drawable/ic_shuffle_24dp"/>
+        app:srcCompat="@drawable/ic_shuffle_24dp"
+        app:shapeAppearanceOverlay="@style/SquareShapeAppearance"
+        app:backgroundTint="#D71921"
+        app:elevation="0dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="1dp"
+        app:tint="#000000"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

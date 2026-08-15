@@ -88,7 +88,9 @@ class MusicBrainzService(private val client: HttpClient) {
         lastRequestTime = System.currentTimeMillis()
     }
 
-    private suspend fun getCoverUrlFromReleaseId(releaseId: String): String? = mutex.withLock {
+    // NOTE: Must only be called while already holding `mutex`. It is NOT safe to call this
+    // from outside a mutex.withLock {} block — Kotlin Mutex is non-reentrant.
+    private suspend fun getCoverUrlFromReleaseId(releaseId: String): String? {
         enforceRateLimit()
         return try {
             val response = client.get("https://coverartarchive.org/release/$releaseId") {
@@ -220,4 +222,84 @@ class MusicBrainzService(private val client: HttpClient) {
             null
         }
     }
+
+    suspend fun searchArtists(artistName: String): List<MBArtist> = mutex.withLock {
+        enforceRateLimit()
+        return try {
+            val query = "artist:\"$artistName\""
+            val response = client.get("https://musicbrainz.org/ws/2/artist/") {
+                header("User-Agent", "AxiomMusicPlayer/0.1.2 (https://github.com/rc/axiom)")
+                url {
+                    parameters.append("query", query)
+                    parameters.append("fmt", "json")
+                }
+            }.body<MusicBrainzArtistResponse>()
+            response.artists
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun getReleaseGroups(artistMbid: String): List<MBReleaseGroup> = mutex.withLock {
+        enforceRateLimit()
+        return try {
+            val response = client.get("https://musicbrainz.org/ws/2/release-group") {
+                header("User-Agent", "AxiomMusicPlayer/0.1.2 (https://github.com/rc/axiom)")
+                url {
+                    parameters.append("artist", artistMbid)
+                    parameters.append("fmt", "json")
+                }
+            }.body<MusicBrainzReleaseGroupResponse>()
+            response.releaseGroups
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun getWikidataQid(mbid: String): String? = mutex.withLock {
+        enforceRateLimit()
+        return try {
+            val response = client.get("https://musicbrainz.org/ws/2/artist/$mbid") {
+                header("User-Agent", "AxiomMusicPlayer/0.1.2 (https://github.com/rc/axiom)")
+                url {
+                    parameters.append("inc", "url-rels")
+                    parameters.append("fmt", "json")
+                }
+            }.body<MusicBrainzArtistRelationsResponse>()
+            val wikidataRel = response.relations.firstOrNull {
+                it.type.equals("wikidata", ignoreCase = true)
+            }
+            val resourceUrl = wikidataRel?.url?.resource ?: return null
+            resourceUrl.substringAfterLast("/")
+        } catch (e: Exception) {
+            null
+        }
+    }
 }
+
+@Serializable
+data class MusicBrainzReleaseGroupResponse(
+    @SerialName("release-groups") val releaseGroups: List<MBReleaseGroup> = emptyList()
+)
+
+@Serializable
+data class MBReleaseGroup(
+    @SerialName("id") val id: String,
+    @SerialName("title") val title: String
+)
+
+@Serializable
+data class MusicBrainzArtistRelationsResponse(
+    @SerialName("relations") val relations: List<MBRelation> = emptyList()
+)
+
+@Serializable
+data class MBRelation(
+    @SerialName("type") val type: String,
+    @SerialName("url") val url: MBRelationUrl
+)
+
+@Serializable
+data class MBRelationUrl(
+    @SerialName("resource") val resource: String
+)

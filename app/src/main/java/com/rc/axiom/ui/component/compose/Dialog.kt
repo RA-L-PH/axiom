@@ -15,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,31 +37,33 @@ fun ConfirmDialog(
     title: String? = null,
     icon: Painter? = null
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = {
-            icon?.let {
-                Icon(
-                    painter = it,
-                    contentDescription = null
-                )
+    MaterialTheme(typography = com.rc.axiom.ui.theme.monoTypography) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            icon = {
+                icon?.let {
+                    Icon(
+                        painter = it,
+                        contentDescription = null
+                    )
+                }
+            },
+            title = {
+                title?.let { Text(it) }
+            },
+            text = { Text(message) },
+            confirmButton = {
+                Button(onClick = onConfirm) {
+                    Text(confirmButton)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(dismissButton)
+                }
             }
-        },
-        title = {
-            title?.let { Text(it) }
-        },
-        text = { Text(message) },
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(confirmButton)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(dismissButton)
-            }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -121,64 +124,66 @@ fun InputDialog(
     val isOverMaxLength = inputLength > inputMaxLength
     val isInputValid = !isOverMaxLength && inputState.text.isNotBlank()
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = {
-            icon?.let {
-                Icon(
-                    painter = it,
-                    contentDescription = null
-                )
-            }
-        },
-        title = {
-            title?.let { Text(it) }
-        },
-        text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Text(
-                    text = message,
-                    modifier = Modifier.fillMaxWidth()
-                )
+    MaterialTheme(typography = com.rc.axiom.ui.theme.monoTypography) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            icon = {
+                icon?.let {
+                    Icon(
+                        painter = it,
+                        contentDescription = null
+                    )
+                }
+            },
+            title = {
+                title?.let { Text(it) }
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = message,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(8.dp))
 
-                OutlinedTextField(
-                    state = inputState,
-                    label = inputHint?.let { { Text(it) } },
-                    isError = isOverMaxLength,
-                    suffix = {
-                        if (inputMaxLength < Int.MAX_VALUE) {
-                            Text("$inputLength/$inputMaxLength")
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Words
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    OutlinedTextField(
+                        state = inputState,
+                        label = inputHint?.let { { Text(it) } },
+                        isError = isOverMaxLength,
+                        suffix = {
+                            if (inputMaxLength < Int.MAX_VALUE) {
+                                Text("$inputLength/$inputMaxLength")
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(8.dp))
 
-                additionalContent?.invoke(this)
+                    additionalContent?.invoke(this)
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onConfirm(inputState.text.toString()) },
+                    enabled = isInputValid
+                ) {
+                    Text(confirmButton)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(dismissButton)
+                }
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(inputState.text.toString()) },
-                enabled = isInputValid
-            ) {
-                Text(confirmButton)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(dismissButton)
-            }
-        }
-    )
+        )
+    }
 }

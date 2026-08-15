@@ -11,6 +11,8 @@
     app:expandedTitleTextAppearance="@style/TextAppearance.Axiom.CollapsingToolbar.Expanded"
     app:expandedTitleMarginStart="24dp"
     app:titleCollapseMode="scale"
+    app:contentScrim="@android:color/transparent"
+    app:statusBarScrim="@android:color/transparent"
     app:layout_scrollFlags="scroll|exitUntilCollapsed|snap|enterAlwaysCollapsed">
 
     <com.google.android.material.appbar.MaterialToolbar

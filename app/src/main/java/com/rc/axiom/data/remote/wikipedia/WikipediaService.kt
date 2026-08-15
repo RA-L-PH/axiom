@@ -149,33 +149,100 @@ class WikipediaService(private val client: HttpClient) {
         }
     }
 
+    suspend fun getWikipediaTitle(wikidataId: String): String? = mutex.withLock {
+        enforceRateLimit()
+        return try {
+            val response = client.get("https://www.wikidata.org/w/api.php") {
+                url {
+                    parameters.append("action", "wbgetentities")
+                    parameters.append("ids", wikidataId)
+                    parameters.append("props", "sitelinks")
+                    parameters.append("sitefilter", "enwiki")
+                    parameters.append("format", "json")
+                }
+            }.body<JsonObject>()
+            val entities = response["entities"]?.jsonObject
+            val entity = entities?.get(wikidataId)?.jsonObject
+            val sitelinks = entity?.get("sitelinks")?.jsonObject
+            val enwiki = sitelinks?.get("enwiki")?.jsonObject
+            enwiki?.get("title")?.jsonPrimitive?.content
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun getArtistImageUrlByTitle(title: String): String? = mutex.withLock {
+        enforceRateLimit()
+        try {
+            val imageResponse = client.get("https://en.wikipedia.org/w/api.php") {
+                url {
+                    parameters.append("action", "query")
+                    parameters.append("titles", title)
+                    parameters.append("prop", "pageimages")
+                    parameters.append("piprop", "original")
+                    parameters.append("format", "json")
+                }
+            }.body<JsonObject>()
+
+            val pages = imageResponse["query"]?.jsonObject?.get("pages")?.jsonObject
+            val pageKey = pages?.keys?.firstOrNull() ?: return null
+            val pageObj = pages[pageKey]?.jsonObject
+            val originalObj = pageObj?.get("original")?.jsonObject
+            originalObj?.get("source")?.jsonPrimitive?.content
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     suspend fun getArtistImageUrl(
         artistName: String,
         songTitles: List<String>,
         albumTitles: List<String> = emptyList()
     ): String? {
         val title = getArtistPageTitle(artistName, songTitles, albumTitles) ?: return null
-        return mutex.withLock {
-            enforceRateLimit()
-            try {
-                val imageResponse = client.get("https://en.wikipedia.org/w/api.php") {
-                    url {
-                        parameters.append("action", "query")
-                        parameters.append("titles", title)
-                        parameters.append("prop", "pageimages")
-                        parameters.append("piprop", "original")
-                        parameters.append("format", "json")
-                    }
-                }.body<JsonObject>()
+        return getArtistImageUrlByTitle(title)
+    }
 
-                val pages = imageResponse["query"]?.jsonObject?.get("pages")?.jsonObject
-                val pageKey = pages?.keys?.firstOrNull() ?: return null
-                val pageObj = pages[pageKey]?.jsonObject
-                val originalObj = pageObj?.get("original")?.jsonObject
-                originalObj?.get("source")?.jsonPrimitive?.content
-            } catch (e: Exception) {
-                null
+    suspend fun getArtistBioByTitle(title: String): String? = mutex.withLock {
+        enforceRateLimit()
+        try {
+            // Query full text of the article to parse sections
+            val response = client.get("https://en.wikipedia.org/w/api.php") {
+                url {
+                    parameters.append("action", "query")
+                    parameters.append("prop", "extracts")
+                    parameters.append("explaintext", "1")
+                    parameters.append("titles", title)
+                    parameters.append("format", "json")
+                }
+            }.body<JsonObject>()
+
+            val pages = response["query"]?.jsonObject?.get("pages")?.jsonObject
+            val pageKey = pages?.keys?.firstOrNull() ?: return null
+            val fullText = pages[pageKey]?.jsonObject?.get("extract")?.jsonPrimitive?.content ?: return null
+
+            // Try to extract the Career section
+            val careerBio = extractCareerSection(fullText)
+            if (!careerBio.isNullOrBlank()) {
+                return careerBio
             }
+
+            // Fallback to page summary (introductory paragraph)
+            val summaryResponse = client.get("https://en.wikipedia.org/w/api.php") {
+                url {
+                    parameters.append("action", "query")
+                    parameters.append("prop", "extracts")
+                    parameters.append("exintro", "1")
+                    parameters.append("explaintext", "1")
+                    parameters.append("titles", title)
+                    parameters.append("format", "json")
+                }
+            }.body<JsonObject>()
+            val summaryPages = summaryResponse["query"]?.jsonObject?.get("pages")?.jsonObject
+            val summaryPageKey = summaryPages?.keys?.firstOrNull() ?: return null
+            summaryPages[summaryPageKey]?.jsonObject?.get("extract")?.jsonPrimitive?.content
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -185,48 +252,7 @@ class WikipediaService(private val client: HttpClient) {
         albumTitles: List<String> = emptyList()
     ): String? {
         val title = getArtistPageTitle(artistName, songTitles, albumTitles) ?: return null
-        return mutex.withLock {
-            enforceRateLimit()
-            try {
-                // Query full text of the article to parse sections
-                val response = client.get("https://en.wikipedia.org/w/api.php") {
-                    url {
-                        parameters.append("action", "query")
-                        parameters.append("prop", "extracts")
-                        parameters.append("explaintext", "1")
-                        parameters.append("titles", title)
-                        parameters.append("format", "json")
-                    }
-                }.body<JsonObject>()
-
-                val pages = response["query"]?.jsonObject?.get("pages")?.jsonObject
-                val pageKey = pages?.keys?.firstOrNull() ?: return null
-                val fullText = pages[pageKey]?.jsonObject?.get("extract")?.jsonPrimitive?.content ?: return null
-
-                // Try to extract the Career section
-                val careerBio = extractCareerSection(fullText)
-                if (!careerBio.isNullOrBlank()) {
-                    return careerBio
-                }
-
-                // Fallback to page summary (introductory paragraph)
-                val summaryResponse = client.get("https://en.wikipedia.org/w/api.php") {
-                    url {
-                        parameters.append("action", "query")
-                        parameters.append("prop", "extracts")
-                        parameters.append("exintro", "1")
-                        parameters.append("explaintext", "1")
-                        parameters.append("titles", title)
-                        parameters.append("format", "json")
-                    }
-                }.body<JsonObject>()
-                val summaryPages = summaryResponse["query"]?.jsonObject?.get("pages")?.jsonObject
-                val summaryPageKey = summaryPages?.keys?.firstOrNull() ?: return null
-                summaryPages[summaryPageKey]?.jsonObject?.get("extract")?.jsonPrimitive?.content
-            } catch (e: Exception) {
-                null
-            }
-        }
+        return getArtistBioByTitle(title)
     }
 
     private fun extractCareerSection(fullText: String): String? {

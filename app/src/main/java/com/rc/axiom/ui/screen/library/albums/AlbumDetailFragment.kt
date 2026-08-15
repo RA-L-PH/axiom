@@ -210,11 +210,11 @@ class AlbumDetailFragment : AbsMainActivityFragment(R.layout.fragment_album_deta
     private fun updateConcatAdapter() {
         concatAdapter = ConcatAdapter(
             headerAdapter,
+            wikiAdapter,
+            extraInfoAdapter,
             songHeaderAdapter,
             simpleSongAdapter,
-            moreAlbumsAdapter,
-            wikiAdapter,
-            extraInfoAdapter
+            moreAlbumsAdapter
         )
         binding.recyclerView.adapter = concatAdapter
     }

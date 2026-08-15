@@ -102,13 +102,14 @@ class HomeAdapter(
 
         init {
             openSuggestion?.setOnClickListener(this)
+            headingTitle?.setOnClickListener(this)
         }
 
         private val current: Suggestion?
             get() = dataSet.getOrNull(bindingAdapterPosition)
 
         override fun onClick(view: View) {
-            if (view === openSuggestion) {
+            if (view === openSuggestion || view === headingTitle) {
                 val suggestion = current ?: return
                 callback.suggestionClick(suggestion)
             }

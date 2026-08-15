@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;
 
 import com.rc.axiom.util.Preferences;
+import com.rc.axiom.core.model.theme.NowPlayingScreen;
 
 /**
  * @author Christians M. A. (rc)
@@ -46,8 +47,39 @@ public class AlbumCoverViewPager extends ViewPager {
 		this.allowSwiping = allowSwiping;
 	}
 
+	private MotionEvent swapXY(MotionEvent ev) {
+		float width = getWidth();
+		float height = getHeight();
+		float newX = (ev.getY() / height) * width;
+		float newY = (ev.getX() / width) * height;
+		ev.setLocation(newX, newY);
+		return ev;
+	}
+
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		if (Preferences.INSTANCE.getNowPlayingScreen() == NowPlayingScreen.Reels) {
+			if (getParent() != null) {
+				getParent().requestDisallowInterceptTouchEvent(true);
+			}
+			boolean intercepted = super.onInterceptTouchEvent(swapXY(ev));
+			swapXY(ev); // swap back
+			return intercepted;
+		}
+		if (allowSwiping) {
+			return super.onInterceptTouchEvent(ev);
+		}
+		return false;
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
+		if (Preferences.INSTANCE.getNowPlayingScreen() == NowPlayingScreen.Reels) {
+			if (getParent() != null) {
+				getParent().requestDisallowInterceptTouchEvent(true);
+			}
+			return super.onTouchEvent(swapXY(ev));
+		}
 		if (allowSwiping) {
 			return super.onTouchEvent(ev);
 		}

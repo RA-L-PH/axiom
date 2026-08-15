@@ -246,7 +246,17 @@ private fun AxiomHeader(
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = stringResource(R.string.app_name),
+            text = androidx.compose.ui.text.buildAnnotatedString {
+                append("a")
+                pushStyle(androidx.compose.ui.text.SpanStyle(color = Color(0xFFD71921)))
+                append("x")
+                pop()
+                append("i")
+                pushStyle(androidx.compose.ui.text.SpanStyle(color = Color(0xFFD71921)))
+                append("o")
+                pop()
+                append("m.")
+            },
             style = MaterialTheme.typography.headlineMedium,
             maxLines = 1
         )

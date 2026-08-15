@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="0dp"
-        app:strokeColor="#FFFFFF"
+        app:strokeColor="@android:color/transparent"
         app:strokeWidth="0dp"
         app:cardElevation="0dp"
         app:cardBackgroundColor="@android:color/transparent"
@@ -87,7 +87,8 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:insetLeft="0dp"
-                android:insetRight="0dp" />
+                android:insetRight="0dp"
+                android:visibility="gone" />
 
         </com.rc.axiom.ui.component.views.WidthFitSquareLayout>
 

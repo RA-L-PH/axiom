@@ -37,7 +37,7 @@ object CryptoUtil {
 
     private const val ALGORITHM = "AES/CBC/PKCS5Padding"
 
-    private val keySpec = SecretKeySpec("Axiom_CUC".toByteArray(), "AES")
+    private val keySpec = SecretKeySpec("Axiom_CUC_AESKey".toByteArray(), "AES")
     private val ivSpec = IvParameterSpec("1234567890123456".toByteArray())
 
     fun encrypt(value: String): String {

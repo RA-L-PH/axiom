@@ -149,18 +149,9 @@ fun Fragment.materialSharedAxis(
     direction: Int = MaterialSharedAxis.X,
     prepareTransition: Boolean = true
 ) {
-    MaterialSharedAxis(direction, true).let { enterTransition = it; exitTransition = it }
-    MaterialSharedAxis(direction, false).let { returnTransition = it; reenterTransition = it }
-    if (prepareTransition) {
-        postponeEnterTransition()
-        view.doOnPreDraw {
-            startPostponedEnterTransition()
-        }
-    }
+    // No-op to disable animations and delays
 }
 
 fun Fragment.topLevelTransition(view: View = requireView()) {
-    Fade().let { enterTransition = it; reenterTransition = it }
-    postponeEnterTransition()
-    view.doOnPreDraw { startPostponedEnterTransition() }
+    // No-op to disable animations and delays
 }

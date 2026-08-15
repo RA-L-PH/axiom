@@ -322,8 +322,6 @@ class ArtistDetailFragment : AbsMainActivityFragment(R.layout.fragment_artist_de
             adapters.add(songAdapter)
         }
 
-        adapters.add(extraInfoAdapter)
-
         concatAdapter = ConcatAdapter(config, adapters)
         if (_binding != null) {
             binding.recyclerView.adapter = concatAdapter

@@ -43,6 +43,7 @@ import com.rc.axiom.R
 import com.rc.axiom.coil.CoverProvider
 import com.rc.axiom.core.model.lyrics.LyricsViewSettings
 import com.rc.axiom.data.local.room.InclExclDao
+import com.rc.axiom.data.model.network.LoginState
 import com.rc.axiom.data.model.network.ScrobblingService
 import com.rc.axiom.extensions.files.getFormattedFileName
 import com.rc.axiom.extensions.hasR
@@ -75,7 +76,6 @@ import com.rc.axiom.ui.screen.update.UpdateViewModel
 import com.rc.axiom.util.ADD_EXTRA_CONTROLS
 import com.rc.axiom.util.BACKUP_DATA
 import com.rc.axiom.util.BLACKLIST_ENABLED
-import com.rc.axiom.util.BLACK_THEME
 import com.rc.axiom.util.BackupContent
 import com.rc.axiom.util.BackupHelper
 import com.rc.axiom.util.COVER_DOUBLE_TAP_ACTION
@@ -91,16 +91,13 @@ import com.rc.axiom.util.LASTFM_LOGIN
 import com.rc.axiom.util.LAST_ADDED_CUTOFF
 import com.rc.axiom.util.LIBRARY_CATEGORIES
 import com.rc.axiom.util.LISTENBRAINZ_LOGIN
-import com.rc.axiom.util.MATERIAL_YOU
 import com.rc.axiom.util.NOW_PLAYING_EXTRA_INFO
-import com.rc.axiom.util.NOW_PLAYING_SCREEN
 import com.rc.axiom.util.ON_CLEAR_QUEUE_ACTION
 import com.rc.axiom.util.ON_SONG_CLICK_ACTION
 import com.rc.axiom.util.PREFERRED_IMAGE_SIZE
 import com.rc.axiom.util.Preferences
 import com.rc.axiom.util.RESTORE_DATA
 import com.rc.axiom.util.TRASH_MUSIC_FILES
-import com.rc.axiom.util.USE_CUSTOM_FONT
 import com.rc.axiom.util.USE_FOLDER_ART
 import com.rc.axiom.util.WHITELIST_ENABLED
 import com.rc.axiom.util.WIDGET_IMAGE_CORNER_RADIUS
@@ -146,6 +143,81 @@ class NetworkPreferencesFragment : PreferenceScreenFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_screen_network)
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val geniusEnabledPref = findPreference<androidx.preference.SwitchPreferenceCompat>("genius_enabled")
+        val geniusTokenPref = findPreference<androidx.preference.Preference>("genius_access_token")
+        val updateGeniusSummary = {
+            val hasToken = !preferences.getString("genius_access_token", "").isNullOrBlank()
+            val status = if (hasToken) "Connected" else "Not set"
+            geniusEnabledPref?.summary = "Fetch artist images, album covers, track info and biographies from Genius API\n[ Status: $status ]"
+        }
+        updateGeniusSummary()
+
+        geniusTokenPref?.onPreferenceChangeListener = androidx.preference.Preference.OnPreferenceChangeListener { _, _ ->
+            view.post { updateGeniusSummary() }
+            true
+        }
+        geniusEnabledPref?.onPreferenceChangeListener = androidx.preference.Preference.OnPreferenceChangeListener { _, _ ->
+            view.post { updateGeniusSummary() }
+            true
+        }
+
+        val spotifyEnabledPref = findPreference<androidx.preference.SwitchPreferenceCompat>("spotify_enabled")
+        val spotifyIdPref = findPreference<androidx.preference.Preference>("spotify_client_id")
+        val updateSpotifySummary = {
+            val hasKeys = !preferences.getString("spotify_client_id", "").isNullOrBlank()
+            val status = if (hasKeys) "Connected" else "Not set"
+            spotifyEnabledPref?.summary = "Fetch high-resolution artist images using Spotify Web API\n[ Status: $status ]"
+        }
+        updateSpotifySummary()
+
+        spotifyIdPref?.onPreferenceChangeListener = androidx.preference.Preference.OnPreferenceChangeListener { _, _ ->
+            view.post { updateSpotifySummary() }
+            true
+        }
+        spotifyEnabledPref?.onPreferenceChangeListener = androidx.preference.Preference.OnPreferenceChangeListener { _, _ ->
+            view.post { updateSpotifySummary() }
+            true
+        }
+
+        val mbEnabledPref = findPreference<androidx.preference.SwitchPreferenceCompat>("musicbrainz_enabled")
+        val updateMbSummary = {
+            val isEnabled = preferences.getBoolean("musicbrainz_enabled", true)
+            val status = if (isEnabled) "Enabled (Public API)" else "Disabled"
+            mbEnabledPref?.summary = "Fetch album and track metadata from MusicBrainz\n[ Status: $status ]"
+        }
+        updateMbSummary()
+
+        mbEnabledPref?.onPreferenceChangeListener = androidx.preference.Preference.OnPreferenceChangeListener { _, _ ->
+            view.post { updateMbSummary() }
+            true
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            libraryViewModel.getLoginState(ScrobblingService.Lastfm).collect { loginState ->
+                val lastfmPref = findPreference<androidx.preference.Preference>("lastfm_login")
+                if (loginState is LoginState.LoggedIn) {
+                    lastfmPref?.summary = "Connected as ${loginState.username}"
+                } else {
+                    lastfmPref?.summary = "Not logged in"
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            libraryViewModel.getLoginState(ScrobblingService.ListenBrainz).collect { loginState ->
+                val lbPref = findPreference<androidx.preference.Preference>("listenbrainz_login")
+                if (loginState is LoginState.LoggedIn) {
+                    lbPref?.summary = "Connected as ${loginState.username}"
+                } else {
+                    lbPref?.summary = "Not logged in"
+                }
+            }
+        }
+    }
 }
 
 class AdvancedPreferencesFragment : PreferenceScreenFragment() {
@@ -157,7 +229,31 @@ class AdvancedPreferencesFragment : PreferenceScreenFragment() {
 open class PreferenceScreenFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val libraryViewModel: LibraryViewModel by activityViewModel()
+    fun filterPreferences(query: String) {
+        val screen = preferenceScreen ?: return
+        filterPreferenceGroup(screen, query)
+    }
+
+    private fun filterPreferenceGroup(group: androidx.preference.PreferenceGroup, query: String): Boolean {
+        var hasVisibleChild = false
+        for (i in 0 until group.preferenceCount) {
+            val pref = group.getPreference(i)
+            if (pref is androidx.preference.PreferenceGroup) {
+                val childVisible = filterPreferenceGroup(pref, query)
+                pref.isVisible = childVisible
+                if (childVisible) hasVisibleChild = true
+            } else {
+                val matches = query.isEmpty() ||
+                        (pref.title?.toString()?.contains(query, ignoreCase = true) == true) ||
+                        (pref.summary?.toString()?.contains(query, ignoreCase = true) == true)
+                pref.isVisible = matches
+                if (matches) hasVisibleChild = true
+            }
+        }
+        return hasVisibleChild
+    }
+
+    protected val libraryViewModel: LibraryViewModel by activityViewModel()
     private val lyricsViewModel: LyricsViewModel by activityViewModel()
     private val updateViewModel: UpdateViewModel by activityViewModel()
 
@@ -208,7 +304,7 @@ open class PreferenceScreenFragment : PreferenceFragmentCompat(),
             }
         }
 
-    private val preferences: SharedPreferences by inject()
+    protected val preferences: SharedPreferences by inject()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
@@ -239,31 +335,9 @@ open class PreferenceScreenFragment : PreferenceFragmentCompat(),
             }
         }
 
-        findPreference<Preference>(BLACK_THEME)?.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                val themeName = Preferences.getGeneralTheme((newValue as Boolean))
-                setDefaultNightMode(Preferences.getDayNightMode(themeName))
-                requireActivity().recreate()
-                true
-            }
-        }
 
-        findPreference<Preference>(MATERIAL_YOU)?.apply {
-            isVisible = hasS()
-            setOnPreferenceChangeListener { _, newValue ->
-                val activity = requireActivity()
-                if (newValue as Boolean) {
-                    DynamicColors.applyToActivityIfAvailable(activity)
-                }
-                activity.recreate()
-                true
-            }
-        }
 
-        findPreference<Preference>(USE_CUSTOM_FONT)?.setOnPreferenceChangeListener { _, _ ->
-            requireActivity().recreate()
-            true
-        }
+
 
         findPreference<Preference>(WIDGET_IMAGE_CORNER_RADIUS)?.isVisible = hasS()
         findPreference<Preference>(ADD_EXTRA_CONTROLS)?.isVisible = !resources.isTablet
@@ -395,8 +469,6 @@ open class PreferenceScreenFragment : PreferenceFragmentCompat(),
             }
         }
 
-        onUpdateNowPlayingScreen()
-        onUpdateCoverActions()
         onUpdateLyricsPreferences()
         onUpdateQueuePreferences()
     }
@@ -410,16 +482,10 @@ open class PreferenceScreenFragment : PreferenceFragmentCompat(),
         } else {
             val dialogFragment: DialogFragment? = when (preference.key) {
                 LIBRARY_CATEGORIES -> CategoriesPreferenceDialog()
-                NOW_PLAYING_SCREEN -> NowPlayingScreenPreferenceDialog()
                 NOW_PLAYING_EXTRA_INFO -> ExtraInfoPreferenceDialog.nowPlaying(requireContext())
                 WIDGET_THIRD_LINE_CONTENT -> ExtraInfoPreferenceDialog.appWidgets(requireContext())
                 ON_SONG_CLICK_ACTION -> SongClickActionPreferenceDialog()
                 ON_CLEAR_QUEUE_ACTION -> ClearQueueActionPreferenceDialog()
-                COVER_DOUBLE_TAP_ACTION,
-                COVER_SINGLE_TAP_ACTION,
-                COVER_LONG_PRESS_ACTION,
-                COVER_LEFT_DOUBLE_TAP_ACTION,
-                COVER_RIGHT_DOUBLE_TAP_ACTION -> ActionOnCoverPreferenceDialog.newInstance(preference.key)
                 LASTFM_LOGIN -> ScrobblingServiceLoginFragment.create(ScrobblingService.Lastfm)
                 LISTENBRAINZ_LOGIN -> ScrobblingServiceLoginFragment.create(ScrobblingService.ListenBrainz)
                 else -> null
@@ -449,37 +515,10 @@ open class PreferenceScreenFragment : PreferenceFragmentCompat(),
 
     override fun onSharedPreferenceChanged(preferences: SharedPreferences, key: String?) {
         when (key) {
-            NOW_PLAYING_SCREEN -> onUpdateNowPlayingScreen()
-            COVER_DOUBLE_TAP_ACTION,
-            COVER_LEFT_DOUBLE_TAP_ACTION,
-            COVER_RIGHT_DOUBLE_TAP_ACTION,
-            COVER_LONG_PRESS_ACTION -> onUpdateCoverActions()
             ON_SONG_CLICK_ACTION,
             ON_CLEAR_QUEUE_ACTION -> onUpdateQueuePreferences()
             LyricsViewSettings.Key.BACKGROUND_EFFECT -> onUpdateLyricsPreferences()
         }
-    }
-
-    private fun onUpdateNowPlayingScreen() {
-        findPreference<Preference>(NOW_PLAYING_SCREEN)?.summary =
-            getString(Preferences.nowPlayingScreen.titleRes)
-    }
-
-    private fun onUpdateCoverActions() {
-        findPreference<Preference>(COVER_SINGLE_TAP_ACTION)?.summary =
-            getString(Preferences.coverSingleTapAction.titleRes)
-
-        findPreference<Preference>(COVER_DOUBLE_TAP_ACTION)?.summary =
-            getString(Preferences.coverDoubleTapAction.titleRes)
-
-        findPreference<Preference>(COVER_LEFT_DOUBLE_TAP_ACTION)?.summary =
-            getString(Preferences.coverLeftDoubleTapAction.titleRes)
-
-        findPreference<Preference>(COVER_RIGHT_DOUBLE_TAP_ACTION)?.summary =
-            getString(Preferences.coverRightDoubleTapAction.titleRes)
-
-        findPreference<Preference>(COVER_LONG_PRESS_ACTION)?.summary =
-            getString(Preferences.coverLongPressAction.titleRes)
     }
 
     private fun onUpdateLyricsPreferences() {

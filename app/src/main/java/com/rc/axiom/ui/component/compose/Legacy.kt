@@ -15,7 +15,7 @@ fun BottomSheetDialogSurface(
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceContainer,
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        shape = RoundedCornerShape(0.dp),
         content = content
     )
 }

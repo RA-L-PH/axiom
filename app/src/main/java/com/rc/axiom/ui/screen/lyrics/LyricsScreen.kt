@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import com.rc.axiom.util.Preferences
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -281,6 +284,7 @@ fun CoverLyricsScreen(
 
     PlayerTheme(playerColorScheme) {
         Box(modifier = modifier.fillMaxSize()) {
+            val isReels = Preferences.nowPlayingScreen == com.rc.axiom.core.model.theme.NowPlayingScreen.Reels
             LyricsSurface(
                 uiState = uiState,
                 playerViewModel = playerViewModel,
@@ -297,7 +301,14 @@ fun CoverLyricsScreen(
                         playerViewModel.play()
                     }
                 },
-                modifier = Modifier.fillMaxSize(),
+                modifier = if (isReels) {
+                    Modifier
+                        .fillMaxWidth(0.7f)
+                        .fillMaxHeight(0.7f)
+                        .align(Alignment.Center)
+                } else {
+                    Modifier.fillMaxSize()
+                },
             )
 
             FilledIconButton(

@@ -87,6 +87,35 @@ class DetailListFragment : AbsMainActivityFragment(R.layout.fragment_detail_list
         binding.toolbar.setTitle(contentType.titleRes)
         binding.title.setText(contentType.titleRes)
 
+        if (contentType == ContentType.History || contentType == ContentType.TopTracks || contentType == ContentType.RecentSongs ||
+            contentType == ContentType.RecentArtists || contentType == ContentType.RecentAlbums || contentType == ContentType.NotRecentlyPlayed) {
+            val ndotTypeface = androidx.core.content.res.ResourcesCompat.getFont(requireContext(), R.font.ndot57)
+            val monoTypeface = androidx.core.content.res.ResourcesCompat.getFont(requireContext(), R.font.letteramonoll)
+            binding.title.typeface = ndotTypeface
+            binding.subtitle.typeface = monoTypeface
+
+            // Redesign play/shuffle buttons to match Nothing OS outline and minimal style
+            binding.playAction.apply {
+                typeface = ndotTypeface
+                strokeColor = android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE)
+                strokeWidth = 1.dp(resources)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT)
+                setTextColor(android.graphics.Color.WHITE)
+                iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE)
+                cornerRadius = 0
+            }
+            binding.shuffleAction.apply {
+                typeface = ndotTypeface
+                val accentRed = android.graphics.Color.parseColor("#D71921")
+                strokeColor = android.content.res.ColorStateList.valueOf(accentRed)
+                strokeWidth = 1.dp(resources)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT)
+                setTextColor(accentRed)
+                iconTint = android.content.res.ColorStateList.valueOf(accentRed)
+                cornerRadius = 0
+            }
+        }
+
         libraryViewModel.getMiniPlayerMargin().observe(viewLifecycleOwner) {
             binding.recyclerView.updatePadding(bottom = it.getWithSpace())
         }
@@ -251,11 +280,13 @@ class DetailListFragment : AbsMainActivityFragment(R.layout.fragment_detail_list
         }
     }
 
-    private fun songAdapter(songs: List<Song> = listOf()): SongAdapter =
-        SongAdapter(requireActivity(), songs, R.layout.item_list, callback = this)
+    private fun songAdapter(songs: List<Song> = listOf()): SongAdapter {
+        val adapter = SongAdapter(requireActivity(), songs, R.layout.item_list, callback = this)
+        return adapter
+    }
 
     private fun artistAdapter(artists: List<Artist> = listOf()): ArtistAdapter =
-        ArtistAdapter(requireActivity(), artists, R.layout.item_grid_circle_single_row, callback = this)
+        ArtistAdapter(requireActivity(), artists, R.layout.item_grid_circle, callback = this)
 
     private fun albumAdapter(albums: List<Album> = listOf()): AlbumAdapter =
         AlbumAdapter(requireActivity(), albums, R.layout.item_grid, callback = this)

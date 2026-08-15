@@ -182,6 +182,7 @@ fun SleepTimerBottomSheet(
                         track = { sliderState ->
                             SliderDefaults.Track(
                                 sliderState = sliderState,
+                                trackCornerSize = SliderTokens.TrackCornerSize,
                                 modifier = Modifier.height(SliderTokens.MediumTrackHeight)
                             )
                         },
@@ -202,7 +203,7 @@ fun SleepTimerBottomSheet(
                                 )
                                 viewModel.setTimerState(value = 15f)
                             },
-                            shape = ButtonGroupDefaults.connectedLeadingButtonShape,
+                            shape = RoundedCornerShape(0.dp),
                             contentPadding = PaddingValues(8.dp),
                             enabled = uiState.isRunning.not(),
                             modifier = Modifier.weight(1f)
@@ -222,7 +223,7 @@ fun SleepTimerBottomSheet(
                                 )
                                 viewModel.setTimerState(value = 45f)
                             },
-                            shape = ShapeDefaults.Small,
+                            shape = RoundedCornerShape(0.dp),
                             contentPadding = PaddingValues(8.dp),
                             enabled = uiState.isRunning.not(),
                             modifier = Modifier.weight(1f)
@@ -242,7 +243,7 @@ fun SleepTimerBottomSheet(
                                 )
                                 viewModel.setTimerState(value = 60f)
                             },
-                            shape = ShapeDefaults.Small,
+                            shape = RoundedCornerShape(0.dp),
                             contentPadding = PaddingValues(8.dp),
                             enabled = uiState.isRunning.not(),
                             modifier = Modifier.weight(1f)
@@ -262,7 +263,7 @@ fun SleepTimerBottomSheet(
                                 )
                                 viewModel.setTimerState(value = 120f)
                             },
-                            shape = ButtonGroupDefaults.connectedTrailingButtonShape,
+                            shape = RoundedCornerShape(0.dp),
                             contentPadding = PaddingValues(8.dp),
                             enabled = uiState.isRunning.not(),
                             modifier = Modifier.weight(1f)
@@ -279,7 +280,7 @@ fun SleepTimerBottomSheet(
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(2.dp),
-                    modifier = Modifier.clip(RoundedCornerShape(16.dp))
+                    modifier = Modifier.clip(RoundedCornerShape(0.dp))
                 ) {
                     SwitchButton(
                         enabled = uiState.isRunning.not(),
@@ -335,6 +336,7 @@ fun SleepTimerBottomSheet(
                                     track = { sliderState ->
                                         SliderDefaults.Track(
                                             sliderState = sliderState,
+                                            trackCornerSize = SliderTokens.TrackCornerSize,
                                             modifier = Modifier.height(SliderTokens.MediumTrackHeight)
                                         )
                                     },
@@ -370,7 +372,8 @@ fun SleepTimerBottomSheet(
                         horizontal = animatedButtonPaddingHorizontal,
                         vertical = animatedButtonPaddingVertical
                     ),
-                    shape = RoundedCornerShape(animatedButtonRadius),
+                    shape = RoundedCornerShape(0.dp),
+                    modifier = Modifier.align(Alignment.End)
                 ) {
                     if (uiState.isRunning) {
                         Icon(
@@ -403,7 +406,7 @@ private fun SwitchButton(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(4.dp))
+            .clip(RoundedCornerShape(0.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerHighest),
     ) {
         Row(
@@ -427,14 +430,12 @@ private fun SwitchButton(
                 modifier = Modifier.weight(1f)
             )
 
-            Switch(
-                enabled = enabled,
-                checked = checked,
-                onCheckedChange = null,
+            com.rc.axiom.ui.component.compose.CustomSquareToggle(
+                checked = checked
             )
         }
 
-        AnimatedVisibility(enabled && checked) {
+        if (enabled && checked) {
             expandableContent()
         }
     }

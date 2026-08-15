@@ -62,10 +62,26 @@ class SettingsFragment : AbsMainActivityFragment(R.layout.fragment_settings), Na
         childNavController = navHostFragment.navController.apply {
             addOnDestinationChangedListener(this@SettingsFragment)
         }
+
+        binding.searchInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val query = s?.toString().orEmpty()
+                val activeFrag = navHostFragment.childFragmentManager.fragments.firstOrNull() as? PreferenceScreenFragment
+                activeFrag?.filterPreferences(query)
+            }
+        })
     }
 
     override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
         binding.appBarLayout.title = destination.label ?: getString(R.string.settings_title)
+        val query = binding.searchInput.text?.toString().orEmpty()
+        view?.post {
+            val navHostFragment = childFragmentManager.findFragmentById(R.id.contentFrame) as? NavHostFragment
+            val activeFrag = navHostFragment?.childFragmentManager?.fragments?.firstOrNull() as? PreferenceScreenFragment
+            activeFrag?.filterPreferences(query)
+        }
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {}

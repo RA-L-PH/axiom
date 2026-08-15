@@ -40,7 +40,7 @@ import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
+import com.rc.axiom.core.appwidgets.NothingTextStyle as TextStyle
 import androidx.glance.unit.ColorProvider
 import androidx.media3.common.Player
 import com.rc.axiom.R

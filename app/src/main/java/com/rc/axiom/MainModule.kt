@@ -59,6 +59,8 @@ import com.rc.axiom.data.remote.jsonHttpClient
 import com.rc.axiom.data.remote.lastfm.LastFmService
 import com.rc.axiom.data.remote.listenbrainz.ListenBrainzService
 import com.rc.axiom.data.remote.lyrics.LyricsDownloadService
+import com.rc.axiom.data.remote.ytmusic.YtMusicService
+import com.rc.axiom.data.remote.genius.GeniusService
 import com.rc.axiom.data.remote.provideOkHttp
 import com.rc.axiom.playback.SleepTimer
 import com.rc.axiom.playback.equalizer.EqualizerManager
@@ -115,6 +117,15 @@ val networkModule = module {
     }
     single {
         LyricsDownloadService(client = get())
+    }
+    single {
+        YtMusicService(client = get())
+    }
+    single {
+        GeniusService(client = get(), preferences = get())
+    }
+    single {
+        LastFmService(client = get(), preferences = get())
     }
 }
 
@@ -281,7 +292,11 @@ private val dataModule = module {
             musicBrainzService = get(),
             wikipediaService = get(),
             spotifyService = get(),
-            audioDbService = get()
+            audioDbService = get(),
+            ytMusicService = get(),
+            geniusService = get(),
+            lastFmService = get(),
+            songRepository = get()
         )
     } bind NetworkRepository::class
 }

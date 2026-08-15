@@ -63,6 +63,14 @@ class PermissionView(context: Context, attrs: AttributeSet? = null) : FrameLayou
         setButtonIcon(mButtonIcon)
         setButtonText(mButtonText)
         setGranted(mGranted)
+
+        try {
+            val ndotTypeface = androidx.core.content.res.ResourcesCompat.getFont(context, R.font.ndot57)
+            mTitleView?.typeface = ndotTypeface
+            mButton?.typeface = ndotTypeface
+            mNumberView?.typeface = ndotTypeface
+        } catch (_: Exception) {}
+        mDescView?.typeface = android.graphics.Typeface.MONOSPACE
     }
 
     fun isGranted(): Boolean = mGranted

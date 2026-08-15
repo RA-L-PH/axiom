@@ -67,13 +67,23 @@ import kotlinx.coroutines.flow.debounce
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.math.roundToInt
 
+import androidx.fragment.app.DialogFragment
+import com.rc.axiom.ui.screen.library.LibraryViewModel
+
+import android.view.Menu
+import android.view.MenuInflater
+
+import android.view.MotionEvent
+
 /**
  * @author Christians M. A. (rc)
  */
-class QueueFragment : BottomSheetDialogFragment(R.layout.fragment_queue),
+class QueueFragment : DialogFragment(R.layout.fragment_queue),
     PopupMenu.OnMenuItemClickListener, View.OnClickListener, ISongCallback {
 
-    private val playerViewModel: PlayerViewModel by activityViewModel()
+    val playerViewModel: PlayerViewModel by activityViewModel()
+    val libraryViewModel: LibraryViewModel by activityViewModel()
+
     private var _binding: FragmentQueueBinding? = null
     private val binding get() = _binding!!
 
@@ -89,22 +99,23 @@ class QueueFragment : BottomSheetDialogFragment(R.layout.fragment_queue),
     private val position: QueuePosition
         get() = playerViewModel.position
 
-    override fun getTheme(): Int = R.style.BottomSheetDialogTheme_EdgeToEdge
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
-        val queueHeight = getFixedQueueHeight()
-        if (!isLandscape()) {
-            if (Preferences.queueHeight) {
-                dialog.behavior.apply {
-                    peekHeight = queueHeight
-                    maxHeight = queueHeight
-                }
-            }
-        } else {
-            dialog.behavior.peekHeight = queueHeight
+    override fun onStart() {
+        super.onStart()
+        val window = dialog?.window ?: return
+        window.setGravity(android.view.Gravity.END)
+        window.setWindowAnimations(R.style.SideSheetAnimation)
+        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        
+        val backgroundDrawable = android.graphics.drawable.GradientDrawable().apply {
+            setColor(android.graphics.Color.BLACK)
+            setStroke(1.dp(requireContext()), android.graphics.Color.WHITE)
         }
-        return dialog
+        window.setBackgroundDrawable(backgroundDrawable)
+        
+        val params = window.attributes
+        params.width = (resources.displayMetrics.widthPixels * 0.70).roundToInt()
+        params.height = android.view.WindowManager.LayoutParams.MATCH_PARENT
+        window.attributes = params
     }
 
     @OptIn(FlowPreview::class)
@@ -114,6 +125,24 @@ class QueueFragment : BottomSheetDialogFragment(R.layout.fragment_queue),
         binding.recyclerView.applyBottomWindowInsets(
             addedSpace = Space.bottom(8.dp(view.context))
         )
+
+        binding.recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            private val gestureDetector = android.view.GestureDetector(requireContext(), object : android.view.GestureDetector.SimpleOnGestureListener() {
+                override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                    if (e1 != null && e2.x - e1.x > 150 && Math.abs(velocityX) > 100 && Math.abs(e2.y - e1.y) < 100) {
+                        findNavController().navigateUp()
+                        return true
+                    }
+                    return false
+                }
+            })
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                gestureDetector.onTouchEvent(e)
+                return false
+            }
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+        })
 
         playingQueueAdapter = PlayingQueueSongAdapter(
             activity = requireActivity(),

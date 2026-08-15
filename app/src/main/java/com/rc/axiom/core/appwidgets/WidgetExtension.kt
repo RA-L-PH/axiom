@@ -16,6 +16,11 @@ import androidx.glance.appwidget.action.actionStartService
 import androidx.glance.color.ColorProvider
 import androidx.glance.color.ColorProviders
 import androidx.glance.color.colorProviders
+import androidx.glance.text.FontFamily
+import androidx.glance.text.TextStyle
+import androidx.glance.text.FontWeight
+import androidx.glance.text.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import com.rc.axiom.core.appwidgets.state.WidgetTheme
 import com.rc.axiom.playback.PlaybackService
 import com.rc.axiom.ui.theme.PaletteStyle
@@ -63,65 +68,58 @@ fun WidgetTheme(
 
 @Composable
 fun WidgetTheme?.getColors(): ColorProviders {
+    val pureBlack = Color(0xFF000000)
+    val pureWhite = Color(0xFFFFFFFF)
+    val darkGray = Color(0xFF121212)
+    val lightGray = Color(0xFF242424)
+    val nothingRed = Color(0xFFFF0800)
     val themeColors = GlanceTheme.colors
-    return if (this == null) themeColors else {
-        colorProviders(
-            primary = ColorProvider(
-                day = Color(lightPrimaryColor),
-                night = Color(darkPrimaryColor)
-            ),
-            onPrimary = ColorProvider(
-                day = Color(lightOnPrimaryColor),
-                night = Color(darkOnPrimaryColor)
-            ),
-            primaryContainer = ColorProvider(
-                day = Color(lightPrimaryContainerColor),
-                night = Color(darkPrimaryContainerColor)
-            ),
-            onPrimaryContainer = ColorProvider(
-                day = Color(lightOnPrimaryContainerColor),
-                night = Color(darkOnPrimaryContainerColor)
-            ),
-            secondary = themeColors.secondary,
-            onSecondary = themeColors.onSecondary,
-            secondaryContainer = themeColors.secondaryContainer,
-            onSecondaryContainer = themeColors.onSecondaryContainer,
-            tertiary = themeColors.tertiary,
-            onTertiary = themeColors.onTertiary,
-            tertiaryContainer = ColorProvider(
-                day = Color(lightTertiaryContainerColor),
-                night = Color(darkTertiaryContainerColor)
-            ),
-            onTertiaryContainer = ColorProvider(
-                day = Color(lightOnTertiaryContainerColor),
-                night = Color(darkOnTertiaryContainerColor)
-            ),
-            error = themeColors.error,
-            errorContainer = themeColors.errorContainer,
-            onError = themeColors.onError,
-            onErrorContainer = themeColors.onErrorContainer,
-            background = themeColors.background,
-            onBackground = themeColors.onBackground,
-            surface = ColorProvider(
-                day = Color(lightSurfaceColor),
-                night = Color(darkSurfaceColor)
-            ),
-            onSurface = ColorProvider(
-                day = Color(lightOnSurfaceColor),
-                night = Color(darkOnSurfaceColor)
-            ),
-            surfaceVariant = themeColors.surfaceVariant,
-            onSurfaceVariant = ColorProvider(
-                day = Color(lightOnSurfaceVariantColor),
-                night = Color(darkOnSurfaceVariantColor)
-            ),
-            outline = themeColors.outline,
-            inverseOnSurface = themeColors.inverseOnSurface,
-            inverseSurface = themeColors.inverseSurface,
-            inversePrimary = themeColors.inversePrimary,
-            widgetBackground = themeColors.widgetBackground
-        )
-    }
+
+    val primaryProvider = ColorProvider(day = pureWhite, night = pureWhite)
+    val onPrimaryProvider = ColorProvider(day = pureBlack, night = pureBlack)
+    val primaryContainerProvider = ColorProvider(day = darkGray, night = darkGray)
+    val onPrimaryContainerProvider = ColorProvider(day = pureWhite, night = pureWhite)
+    val secondaryProvider = ColorProvider(day = nothingRed, night = nothingRed)
+    val onSecondaryProvider = ColorProvider(day = pureWhite, night = pureWhite)
+    val secondaryContainerProvider = ColorProvider(day = lightGray, night = lightGray)
+    val onSecondaryContainerProvider = ColorProvider(day = pureWhite, night = pureWhite)
+    val backgroundProvider = ColorProvider(day = pureBlack, night = pureBlack)
+    val onBackgroundProvider = ColorProvider(day = pureWhite, night = pureWhite)
+    val surfaceProvider = ColorProvider(day = darkGray, night = darkGray)
+    val onSurfaceProvider = ColorProvider(day = pureWhite, night = pureWhite)
+    val surfaceVariantProvider = ColorProvider(day = pureBlack, night = pureBlack)
+    val onSurfaceVariantProvider = ColorProvider(day = Color(0xFF888888), night = Color(0xFF888888))
+    val outlineProvider = ColorProvider(day = Color(0xFF333333), night = Color(0xFF333333))
+
+    return colorProviders(
+        primary = primaryProvider,
+        onPrimary = onPrimaryProvider,
+        primaryContainer = primaryContainerProvider,
+        onPrimaryContainer = onPrimaryContainerProvider,
+        secondary = secondaryProvider,
+        onSecondary = onSecondaryProvider,
+        secondaryContainer = secondaryContainerProvider,
+        onSecondaryContainer = onSecondaryContainerProvider,
+        tertiary = themeColors.tertiary,
+        onTertiary = themeColors.onTertiary,
+        tertiaryContainer = secondaryContainerProvider,
+        onTertiaryContainer = onSecondaryContainerProvider,
+        error = themeColors.error,
+        errorContainer = themeColors.errorContainer,
+        onError = themeColors.onError,
+        onErrorContainer = themeColors.onErrorContainer,
+        background = backgroundProvider,
+        onBackground = onBackgroundProvider,
+        surface = surfaceProvider,
+        onSurface = onSurfaceProvider,
+        surfaceVariant = surfaceVariantProvider,
+        onSurfaceVariant = onSurfaceVariantProvider,
+        outline = outlineProvider,
+        inverseOnSurface = themeColors.inverseOnSurface,
+        inverseSurface = themeColors.inverseSurface,
+        inversePrimary = themeColors.inversePrimary,
+        widgetBackground = backgroundProvider
+    )
 }
 
 fun playbackAction(context: Context, mediaKeyCode: Int): Action {
@@ -147,4 +145,28 @@ fun toggleFavoriteAction(context: Context): Action {
     val intent = Intent(PlaybackService.ACTION_TOGGLE_FAVORITE)
     intent.setComponent(ComponentName(context, PlaybackService::class.java))
     return actionStartService(intent)
+}
+
+fun NothingTextStyle(
+    color: androidx.glance.unit.ColorProvider? = null,
+    fontSize: TextUnit? = null,
+    fontWeight: FontWeight? = null,
+    textAlign: TextAlign? = null
+): TextStyle {
+    return if (color != null) {
+        TextStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontFamily = FontFamily.Monospace,
+            textAlign = textAlign
+        )
+    } else {
+        TextStyle(
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontFamily = FontFamily.Monospace,
+            textAlign = textAlign
+        )
+    }
 }

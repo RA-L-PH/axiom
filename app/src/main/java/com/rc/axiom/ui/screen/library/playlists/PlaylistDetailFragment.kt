@@ -45,6 +45,7 @@ import com.rc.axiom.data.mapper.toSongsEntity
 import com.rc.axiom.data.model.Song
 import com.rc.axiom.databinding.FragmentPlaylistDetailBinding
 import com.rc.axiom.extensions.applyHorizontalWindowInsets
+import com.rc.axiom.extensions.dp
 import com.rc.axiom.extensions.isLandscape
 import com.rc.axiom.extensions.isNullOrEmpty
 import com.rc.axiom.extensions.materialSharedAxis
@@ -112,6 +113,33 @@ class PlaylistDetailFragment : AbsMainActivityFragment(R.layout.fragment_playlis
 
         setSupportActionBar(binding.toolbar)
         //binding.collapsingAppBarLayout.setupStatusBarScrim(requireContext())
+
+        val ndotTypeface = androidx.core.content.res.ResourcesCompat.getFont(requireContext(), R.font.ndot57)
+        val monoTypeface = androidx.core.content.res.ResourcesCompat.getFont(requireContext(), R.font.letteramonoll)
+        binding.header.title.typeface = ndotTypeface
+        binding.header.subtitle.typeface = monoTypeface
+        binding.header.description.typeface = monoTypeface
+
+        // Redesign play/shuffle buttons to match Nothing OS outline and minimal style
+        binding.header.playAction.apply {
+            typeface = ndotTypeface
+            strokeColor = android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE)
+            strokeWidth = 1.dp(resources)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT)
+            setTextColor(android.graphics.Color.WHITE)
+            iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE)
+            cornerRadius = 0
+        }
+        binding.header.shuffleAction.apply {
+            typeface = ndotTypeface
+            val accentRed = android.graphics.Color.parseColor("#D71921")
+            strokeColor = android.content.res.ColorStateList.valueOf(accentRed)
+            strokeWidth = 1.dp(resources)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT)
+            setTextColor(accentRed)
+            iconTint = android.content.res.ColorStateList.valueOf(accentRed)
+            cornerRadius = 0
+        }
 
         libraryViewModel.getMiniPlayerMargin().observe(viewLifecycleOwner) {
             binding.recyclerView.updatePadding(bottom = it.getWithSpace())

@@ -119,8 +119,5 @@ fun NavGraph.isValidCategory(id: Int): Boolean {
 }
 
 fun <T : View> Array<Pair<T, String>>?.asFragmentExtras(): FragmentNavigator.Extras {
-    if (isNullOrEmpty()) {
-        return FragmentNavigator.Extras.Builder().build()
-    }
-    return FragmentNavigatorExtras(*this)
+    return FragmentNavigator.Extras.Builder().build()
 }

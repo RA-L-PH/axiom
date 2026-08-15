@@ -2,6 +2,7 @@ package com.rc.axiom.ui.component.compose
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -88,7 +89,6 @@ fun TitledCard(
         content = content
     )
 }
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TitledCard(
@@ -104,11 +104,12 @@ private fun TitledCard(
     content: @Composable (PaddingValues) -> Unit
 ) {
     Card(
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = containerColor ?: MaterialTheme.colorScheme.surfaceVariant.copy(
-                alpha = SurfaceColorTokens.SurfaceVariantAlpha
-            )
+            containerColor = containerColor ?: Color.Black
         ),
+        border = BorderStroke(1.dp, Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier
     ) {
         Row(
@@ -139,7 +140,7 @@ private fun TitledCard(
             titleEndContent()
         }
 
-        AnimatedVisibility(visible = expanded) {
+        if (expanded) {
             content(PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp))
         }
     }

@@ -188,7 +188,7 @@ fun SoundSettingsSheet(
                                 modifier = Modifier.fillMaxWidth()
                             )
 
-                            AnimatedVisibility(visible = enableAudioEffects) {
+                            if (enableAudioEffects) {
                                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                                     Column(
                                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -250,7 +250,7 @@ fun SoundSettingsSheet(
                 }
 
                 item {
-                    AnimatedVisibility(visible = isBitPerfectActuallyActive.not()) {
+                    if (isBitPerfectActuallyActive.not()) {
                         TitledCard(
                             title = stringResource(R.string.speed_and_pitch_label),
                             titleEndContent = {
@@ -533,7 +533,7 @@ private fun AudioDeviceInfo(
     onClick: () -> Unit
 ) {
     Card(
-        shape = MaterialTheme.shapes.large,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
                 alpha = SurfaceColorTokens.SurfaceVariantAlpha
@@ -552,7 +552,7 @@ private fun AudioDeviceInfo(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(MaterialTheme.shapes.medium)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(0.dp))
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -583,19 +583,18 @@ private fun AudioDeviceInfo(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                AnimatedVisibility(
-                    visible = bitPerfectState.isActive,
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    ShapedText(
-                        text = stringResource(
-                            R.string.bit_perfect_info,
-                            bitPerfectState.encodingLabel,
-                            bitPerfectState.sampleRateLabel
-                        ),
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                if (bitPerfectState.isActive) {
+                    Box(modifier = Modifier.padding(top = 4.dp)) {
+                        ShapedText(
+                            text = stringResource(
+                                R.string.bit_perfect_info,
+                                bitPerfectState.encodingLabel,
+                                bitPerfectState.sampleRateLabel
+                            ),
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
         }
@@ -639,21 +638,8 @@ private fun LabeledSwitch(
             )
         }
 
-        Switch(
-            checked = checked,
-            enabled = enabled,
-            onCheckedChange = {
-                onStateChange(it)
-            },
-            thumbContent = {
-                if (checked) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_check_24dp),
-                        contentDescription = null,
-                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                    )
-                }
-            }
+        com.rc.axiom.ui.component.compose.CustomSquareToggle(
+            checked = checked
         )
     }
 }

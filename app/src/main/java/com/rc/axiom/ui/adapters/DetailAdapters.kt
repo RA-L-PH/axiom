@@ -135,10 +135,10 @@ class WikiAdapter : RecyclerView.Adapter<WikiAdapter.ViewHolder>() {
             val toggleExpansion = {
                 if (holder.binding.wiki.maxLines == 4) {
                     holder.binding.wiki.maxLines = Integer.MAX_VALUE
-                    holder.binding.wikiChevron.text = "∧"
+                    holder.binding.wikiChevron.setImageResource(R.drawable.ic_keyboard_arrow_up_24dp)
                 } else {
                     holder.binding.wiki.maxLines = 4
-                    holder.binding.wikiChevron.text = "∨"
+                    holder.binding.wikiChevron.setImageResource(R.drawable.ic_keyboard_arrow_down_24dp)
                 }
             }
             holder.binding.wiki.setOnClickListener { toggleExpansion() }

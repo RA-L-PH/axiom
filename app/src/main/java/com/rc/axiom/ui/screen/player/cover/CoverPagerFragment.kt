@@ -30,6 +30,9 @@ import androidx.core.animation.doOnStart
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -96,6 +99,18 @@ class CoverPagerFragment : Fragment(R.layout.fragment_player_album_cover),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPlayerAlbumCoverBinding.bind(view)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.viewPager) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val isReels = Preferences.nowPlayingScreen == com.rc.axiom.core.model.theme.NowPlayingScreen.Reels
+            if (isReels) {
+                v.updatePadding(bottom = systemBars.bottom)
+            } else {
+                v.updatePadding(bottom = 0)
+            }
+            insets
+        }
+
         coverLyricsFragment =
             childFragmentManager.findFragmentById(R.id.coverLyricsFragment) as? CoverLyricsFragment
         navController = findActivityNavController(R.id.fragment_container)
@@ -118,7 +133,24 @@ class CoverPagerFragment : Fragment(R.layout.fragment_player_album_cover),
     }
 
     private fun applyCurrentTransition() {
-        if (nps.supportsCarouselEffect && Preferences.isCarouselEffect && !resources.isLandscape) {
+        if (nps == NowPlayingScreen.Reels) {
+            viewPager.clipToPadding = false
+            viewPager.setPadding(0, 0, 0, 0)
+            viewPager.pageMargin = 0
+            viewPager.offscreenPageLimit = 2
+            viewPager.setPageTransformer(false) { view, position ->
+                if (position < -1f || position > 1f) {
+                    view.alpha = 0f
+                    view.translationX = 0f
+                    view.translationY = 0f
+                } else {
+                    view.alpha = 1f
+                    view.translationX = view.width * -position
+                    val yPosition = position * view.height
+                    view.translationY = yPosition
+                }
+            }
+        } else if (nps.supportsCarouselEffect && Preferences.isCarouselEffect && !resources.isLandscape) {
             val metrics = resources.displayMetrics
             val ratio = metrics.heightPixels.toFloat() / metrics.widthPixels.toFloat()
             val padding = if (ratio >= 1.777f) 40 else 100
@@ -138,15 +170,25 @@ class CoverPagerFragment : Fragment(R.layout.fragment_player_album_cover),
     private fun setupPageTransformer() {
         val gesturesListener = (parentFragment as? AbsPlayerFragment)
         if (gesturesListener != null) {
-            gesturesController = PlayerGesturesController(
-                context = viewPager.context,
-                acceptedGestures = setOf(
+            val gestureSet = if (nps == NowPlayingScreen.Reels) {
+                setOf(
+                    GestureType.Tap,
+                    GestureType.DoubleTap(GestureType.DoubleTap.TYPE_CENTER),
+                    GestureType.Fling(GestureType.Fling.DIRECTION_LEFT),
+                    GestureType.Fling(GestureType.Fling.DIRECTION_RIGHT)
+                )
+            } else {
+                setOf(
                     GestureType.Tap,
                     GestureType.DoubleTap(GestureType.DoubleTap.TYPE_CENTER),
                     GestureType.DoubleTap(GestureType.DoubleTap.TYPE_LEFT_EDGE),
                     GestureType.DoubleTap(GestureType.DoubleTap.TYPE_RIGHT_EDGE),
                     GestureType.LongPress
-                ),
+                )
+            }
+            gesturesController = PlayerGesturesController(
+                context = viewPager.context,
+                acceptedGestures = gestureSet,
                 listener = gesturesListener
             )
             viewPager.setOnTouchListener(gesturesController)
@@ -243,14 +285,17 @@ class CoverPagerFragment : Fragment(R.layout.fragment_player_album_cover),
 
         isAnimatingLyrics = true
 
+        val isReels = Preferences.nowPlayingScreen == com.rc.axiom.core.model.theme.NowPlayingScreen.Reels
+        val targetAlpha = if (isReels) 0.2f else 0f
+
         val animatorSet = AnimatorSet()
         animatorSet.playTogether(
             ObjectAnimator.ofFloat(binding.coverLyricsFragment, View.ALPHA, 1f),
-            ObjectAnimator.ofFloat(binding.viewPager, View.ALPHA, 0f)
+            ObjectAnimator.ofFloat(binding.viewPager, View.ALPHA, targetAlpha)
         )
         animatorSet.duration = AXIOM_ANIM_TIME
         animatorSet.doOnEnd {
-            _binding?.viewPager?.isInvisible = true
+            _binding?.viewPager?.isInvisible = (targetAlpha == 0f)
             isAnimatingLyrics = false
             it.removeAllListeners()
         }

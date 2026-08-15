@@ -32,7 +32,7 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
-import androidx.glance.text.TextStyle
+import com.rc.axiom.core.appwidgets.NothingTextStyle as TextStyle
 import com.rc.axiom.R
 import com.rc.axiom.core.appwidgets.state.PlaybackState
 import com.rc.axiom.core.appwidgets.state.PlaybackStateDefinition

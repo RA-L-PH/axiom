@@ -11,33 +11,9 @@
         app:widgetLayout="@layout/preference_general_theme"
         app:key="general_theme"/>
 
-    <SwitchPreferenceCompat
-        app:iconSpaceReserved="true"
-        app:title="@string/material_you_title"
-        app:defaultValue="false"
-        app:enabled="false"
-        app:summary="Disabled for axiom"
-        app:layout="@layout/list_item_view"
-        app:widgetLayout="@layout/preference_switch"
-        app:key="material_you"/>
 
-    <SwitchPreferenceCompat
-        app:iconSpaceReserved="true"
-        app:title="@string/pure_black_theme_title"
-        app:defaultValue="true"
-        app:enabled="false"
-        app:summary="Always on"
-        app:layout="@layout/list_item_view"
-        app:widgetLayout="@layout/preference_switch"
-        app:key="black_theme"/>
 
-    <SwitchPreferenceCompat
-        app:icon="@drawable/ic_text_fields_24dp"
-        app:title="@string/use_custom_font_title"
-        app:defaultValue="true"
-        app:layout="@layout/list_item_view"
-        app:widgetLayout="@layout/preference_switch"
-        app:key="use_custom_font"/>
+
 
     <ListPreference
         app:iconSpaceReserved="true"
@@ -70,17 +46,7 @@
             app:widgetLayout="@layout/preference_switch"
             app:key="remember_last_page"/>
 
-        <ListPreference
-            app:iconSpaceReserved="true"
-            app:title="@string/tab_mode_title"
-            app:entries="@array/pref_tab_titles_mode_entries"
-            app:entryValues="@array/pref_tab_titles_mode_values"
-            app:useSimpleSummaryProvider="true"
-            app:defaultValue="unlabelled"
-            app:enabled="false"
-            app:summary="Always unlabelled"
-            app:layout="@layout/list_item_view"
-            app:key="tab_titles_mode"/>
+
 
         <SwitchPreferenceCompat
             app:iconSpaceReserved="true"

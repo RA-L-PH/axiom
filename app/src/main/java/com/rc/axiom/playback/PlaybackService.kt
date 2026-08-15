@@ -294,12 +294,23 @@ class PlaybackService :
 
         setForegroundServiceTimeoutMs(FOREGROUND_SERVICE_TIMEOUT)
         setMediaNotificationProvider(
-            DefaultMediaNotificationProvider(
-                this,
+            object : DefaultMediaNotificationProvider(
+                this@PlaybackService,
                 { _ -> NOTIFICATION_ID },
                 CHANNEL_ID,
                 R.string.playing_notification_description
-            ).apply {
+            ) {
+                override fun addNotificationActions(
+                    mediaSession: MediaSession,
+                    mediaButtons: com.google.common.collect.ImmutableList<CommandButton>,
+                    builder: androidx.core.app.NotificationCompat.Builder,
+                    actionFactory: androidx.media3.session.MediaNotification.ActionFactory
+                ): IntArray {
+                    builder.setColor(android.graphics.Color.RED)
+                    builder.setColorized(true)
+                    return super.addNotificationActions(mediaSession, mediaButtons, builder, actionFactory)
+                }
+            }.apply {
                 setSmallIcon(R.drawable.ic_stat_music_playback)
             }
         )

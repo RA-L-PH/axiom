@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:background="#000000">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/hello_label"
@@ -56,46 +57,424 @@
         app:layout_constraintBottom_toTopOf="@+id/finish">
 
         <LinearLayout
-            android:id="@+id/permissions_column"
+            android:id="@+id/scroll_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.rc.axiom.ui.component.views.PermissionView
-                android:id="@+id/storage_access"
+            <LinearLayout
+                android:id="@+id/step_permissions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:permissionTitle="@string/permission_external_storage_title"
-                app:permissionDescription="@string/permission_external_storage_description"
-                app:buttonText="@string/grant_access_action"
-                app:buttonIcon="@drawable/ic_sd_card_24dp"/>
+                android:orientation="vertical"
+                android:visibility="visible">
 
-            <com.rc.axiom.ui.component.views.PermissionView
-                android:id="@+id/nearby_devices"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:permissionTitle="@string/permission_bluetooth_title"
-                app:permissionDescription="@string/permission_bluetooth_description"
-                app:buttonText="@string/grant_access_action"
-                app:buttonIcon="@drawable/ic_bluetooth_connected_24dp"/>
+                <com.rc.axiom.ui.component.views.PermissionView
+                    android:id="@+id/storage_access"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:permissionTitle="@string/permission_external_storage_title"
+                    app:permissionDescription="@string/permission_external_storage_description"
+                    app:buttonText="@string/grant_access_action"
+                    app:buttonIcon="@drawable/ic_sd_card_24dp"/>
 
-            <com.rc.axiom.ui.component.views.PermissionView
-                android:id="@+id/read_images"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:permissionTitle="@string/permission_read_images_title"
-                app:permissionDescription="@string/permission_read_images_summary"
-                app:buttonText="@string/grant_access_action"
-                app:buttonIcon="@drawable/ic_image_24dp"/>
+                <com.rc.axiom.ui.component.views.PermissionView
+                    android:id="@+id/nearby_devices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:permissionTitle="@string/permission_bluetooth_title"
+                    app:permissionDescription="@string/permission_bluetooth_description"
+                    app:buttonText="@string/grant_access_action"
+                    app:buttonIcon="@drawable/ic_bluetooth_connected_24dp"/>
 
-            <com.rc.axiom.ui.component.views.PermissionView
-                android:id="@+id/schedule_exact_alarms"
+                <com.rc.axiom.ui.component.views.PermissionView
+                    android:id="@+id/read_images"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:permissionTitle="@string/permission_read_images_title"
+                    app:permissionDescription="@string/permission_read_images_summary"
+                    app:buttonText="@string/grant_access_action"
+                    app:buttonIcon="@drawable/ic_image_24dp"/>
+
+                <com.rc.axiom.ui.component.views.PermissionView
+                    android:id="@+id/schedule_exact_alarms"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:permissionTitle="@string/permission_exact_alarms_title"
+                    app:permissionDescription="@string/permission_exact_alarms_description"
+                    app:buttonText="@string/grant_access_action"
+                    app:buttonIcon="@drawable/ic_timer_24dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/step_api_keys"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:permissionTitle="@string/permission_exact_alarms_title"
-                app:permissionDescription="@string/permission_exact_alarms_description"
-                app:buttonText="@string/grant_access_action"
-                app:buttonIcon="@drawable/ic_timer_24dp"/>
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingHorizontal="24dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:fontFamily="monospace"
+                    android:textColor="#88FFFFFF"
+                    android:textSize="12sp"
+                    android:lineSpacingMultiplier="1.2"
+                    android:text="Axiom operates offline by default. Setting up optional API keys enables online integrations:\n\n* Genius: lyrics &amp; artist biographies\n* Spotify: playlist importing &amp; database syncing\n* Last.fm: release details &amp; scrobbling\n* ListenBrainz: track scrobbling &amp; recommendation logs" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="API KEYS SETUP"
+                    android:fontFamily="@font/ndot57"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- GENIUS SECTION -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="[ GENIUS ]"
+                    android:fontFamily="@font/ndot57"
+                    android:textColor="#FFFF0800"
+                    android:textSize="12sp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Genius Client ID -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="GENIUS CLIENT ID"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:textColor="#88FFFFFF"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/genius_client_id_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingVertical="8dp"
+                        android:hint="enter client id..."
+                        android:textColorHint="#44FFFFFF"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/genius_client_id_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#88FFFFFF"/>
+                </LinearLayout>
+
+                <!-- Genius Client Secret -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="GENIUS CLIENT SECRET"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:textColor="#88FFFFFF"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/genius_client_secret_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:paddingVertical="8dp"
+                        android:hint="enter client secret..."
+                        android:textColorHint="#44FFFFFF"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/genius_client_secret_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#88FFFFFF"/>
+                </LinearLayout>
+
+                <!-- Genius Access Token -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="GENIUS CLIENT ACCESS TOKEN"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:textColor="#88FFFFFF"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/genius_token_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:paddingVertical="8dp"
+                        android:hint="enter access token..."
+                        android:textColorHint="#44FFFFFF"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/genius_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#88FFFFFF"/>
+                </LinearLayout>
+
+                <!-- SPOTIFY SECTION -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="[ SPOTIFY ]"
+                    android:fontFamily="@font/ndot57"
+                    android:textColor="#FFFF0800"
+                    android:textSize="12sp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Spotify Client ID -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SPOTIFY CLIENT ID"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:textColor="#88FFFFFF"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/spotify_id_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingVertical="8dp"
+                        android:hint="enter client id..."
+                        android:textColorHint="#44FFFFFF"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/spotify_id_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#88FFFFFF"/>
+                </LinearLayout>
+
+                <!-- Spotify Client Secret -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SPOTIFY CLIENT SECRET"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:textColor="#88FFFFFF"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/spotify_secret_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:paddingVertical="8dp"
+                        android:hint="enter client secret..."
+                        android:textColorHint="#44FFFFFF"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/spotify_secret_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#88FFFFFF"/>
+                </LinearLayout>
+
+                <!-- LISTENBRAINZ SECTION -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="[ LISTENBRAINZ ]"
+                    android:fontFamily="@font/ndot57"
+                    android:textColor="#FFFF0800"
+                    android:textSize="12sp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- ListenBrainz Token -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="LISTENBRAINZ USER TOKEN"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:textColor="#88FFFFFF"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/listenbrainz_token_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:paddingVertical="8dp"
+                        android:hint="enter user token..."
+                        android:textColorHint="#44FFFFFF"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/listenbrainz_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#88FFFFFF"/>
+                </LinearLayout>
+
+                <!-- LAST.FM SECTION -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="[ LAST.FM ]"
+                    android:fontFamily="@font/ndot57"
+                    android:textColor="#FFFF0800"
+                    android:textSize="12sp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Last.fm Key -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="LAST.FM API KEY"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:textColor="#88FFFFFF"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/lastfm_key_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingVertical="8dp"
+                        android:hint="enter api key..."
+                        android:textColorHint="#44FFFFFF"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/lastfm_key_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#88FFFFFF"/>
+                </LinearLayout>
+
+                <!-- Last.fm Secret -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="24dp">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="LAST.FM API SECRET"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:textColor="#88FFFFFF"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/lastfm_secret_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:paddingVertical="8dp"
+                        android:hint="enter api secret..."
+                        android:textColorHint="#44FFFFFF"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/lastfm_secret_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#88FFFFFF"/>
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -110,7 +489,10 @@
         android:layout_marginBottom="16dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="@string/get_started"
+        android:text="NEXT"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#FFFF0800"
+        app:cornerRadius="0dp"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

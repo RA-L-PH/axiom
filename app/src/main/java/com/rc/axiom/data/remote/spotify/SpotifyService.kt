@@ -120,7 +120,8 @@ class SpotifyService(
                 }.body<SpotifyTokenResponse>()
 
                 cachedToken = response.accessToken
-                tokenExpiryTime = System.currentTimeMillis() + (response.expiresIn * 1000) - 60000 // 1 minute buffer
+                // Use toLong() before multiplication to prevent Int overflow
+                tokenExpiryTime = System.currentTimeMillis() + response.expiresIn.toLong() * 1000L - 60_000L
                 cachedToken
             } catch (e: Exception) {
                 null
@@ -132,9 +133,13 @@ class SpotifyService(
         artistName: String,
         songTitles: List<String> = emptyList(),
         albumTitles: List<String> = emptyList()
-    ): String? = rateLimitMutex.withLock {
-        enforceRateLimit()
+    ): String? {
+        // Fetch token BEFORE acquiring rateLimitMutex to avoid nested-lock inversion:
+        // getAccessToken() acquires tokenMutex internally, so it must not be called
+        // while rateLimitMutex is already held by this coroutine.
         val token = getAccessToken() ?: return null
+        return rateLimitMutex.withLock {
+        enforceRateLimit()
         return try {
             val response = client.get("https://api.spotify.com/v1/search") {
                 header("Authorization", "Bearer $token")
@@ -190,10 +195,11 @@ class SpotifyService(
                 }
             }
 
-            val finalArtist = bestCandidate ?: items.firstOrNull() ?: return null
+            val finalArtist = bestCandidate ?: items.firstOrNull() ?: return@withLock null
             finalArtist.images.firstOrNull()?.url
         } catch (e: Exception) {
             null
         }
+        } // end rateLimitMutex.withLock
     }
 }

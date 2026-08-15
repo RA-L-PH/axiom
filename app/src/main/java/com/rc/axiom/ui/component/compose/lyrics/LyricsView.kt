@@ -72,6 +72,7 @@ import com.rc.axiom.data.model.lyrics.LyricsActor
 import com.rc.axiom.data.model.lyrics.SyncedLyrics
 import com.rc.axiom.extensions.hasS
 import com.rc.axiom.extensions.utilities.isRtl
+import com.rc.axiom.util.Preferences
 import com.rc.axiom.ui.component.compose.decoration.FadingEdges
 import com.rc.axiom.ui.component.compose.decoration.fadingEdges
 import kotlin.math.PI
@@ -163,7 +164,7 @@ fun LyricsView(
                 index = index,
                 selectedIndex = state.currentLineIndex,
                 selectedLine = index == state.currentLineIndex,
-                isCenterHorizontally = settings.isCenterHorizontally,
+                isCenterHorizontally = if (Preferences.nowPlayingScreen == com.rc.axiom.core.model.theme.NowPlayingScreen.Reels) true else settings.isCenterHorizontally,
                 enableSyllable = settings.enableSyllableLyrics && isPowerSaveMode.not(),
                 enableKaraokeStyle = settings.enableKaraokeStyle,
                 progressiveColoring = settings.progressiveColoring && isPowerSaveMode.not(),
@@ -536,8 +537,15 @@ private fun LineSyncedView(
 ) {
     var textHeight by remember { mutableFloatStateOf(0f) }
 
+    val isReels = Preferences.nowPlayingScreen == com.rc.axiom.core.model.theme.NowPlayingScreen.Reels
+    val reelsColor = if (isReels) {
+        if (selectedLine) Color(0xFFD71921) else Color.White
+    } else {
+        color
+    }
+
     val animatedAlpha by animateFloatAsState(
-        targetValue = if (selectedLine) 1f else .4f,
+        targetValue = if (selectedLine) 1f else if (isReels) 1f else .4f,
         animationSpec = tween(400),
         label = "current-line-alpha-animation"
     )
@@ -554,25 +562,25 @@ private fun LineSyncedView(
 
     val shadow = if (shadowEffect && selectedLine) {
         Shadow(
-            color = color.copy(alpha = .5f),
+            color = reelsColor.copy(alpha = .5f),
             blurRadius = shadowRadius
         )
     } else {
         Shadow.None
     }
 
-    val textStyle by remember(color, selectedLine, progressiveColoring, animatedOrigin) {
+    val textStyle by remember(reelsColor, selectedLine, progressiveColoring, animatedOrigin, isReels, animatedAlpha) {
         derivedStateOf {
-            if (progressiveColoring) {
+            if (progressiveColoring && !isReels) {
                 style.copy(
                     brush = Brush.verticalGradient(
-                        colors = listOf(color, color.copy(alpha = .4f)),
+                        colors = listOf(reelsColor, reelsColor.copy(alpha = .4f)),
                         startY = animatedOrigin - 10f,
                         endY = animatedOrigin + 10f
                     )
                 )
             } else {
-                style.copy(color = color.copy(alpha = animatedAlpha))
+                style.copy(color = reelsColor.copy(alpha = animatedAlpha))
             }
         }
     }
@@ -600,13 +608,20 @@ private fun WordSyncedText(
     align: TextAlign,
     modifier: Modifier = Modifier
 ) {
+    val isReels = Preferences.nowPlayingScreen == com.rc.axiom.core.model.theme.NowPlayingScreen.Reels
+    val reelsColor = if (isReels) {
+        if (selectedLine) Color(0xFFD71921) else Color.White
+    } else {
+        contentColor
+    }
+
     if (karaokeStyle) {
         KaraokeLineView(
             selectedLine = selectedLine,
             shadowEffect = shadowEffect,
             currentMillis = progress,
             syllables = syllables,
-            contentColor = contentColor,
+            contentColor = reelsColor,
             style = style,
             align = align,
             modifier = modifier
@@ -617,7 +632,7 @@ private fun WordSyncedText(
             shadowEffect = shadowEffect,
             currentMillis = progress,
             syllables = syllables,
-            contentColor = contentColor,
+            contentColor = reelsColor,
             style = style,
             align = align,
             modifier = modifier

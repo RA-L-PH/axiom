@@ -35,14 +35,22 @@ import com.rc.axiom.data.remote.listenbrainz.model.ListenBrainzSubmission
 import com.rc.axiom.data.remote.listenbrainz.model.ListenBrainzTrackAdditionalInfo
 import com.rc.axiom.data.remote.listenbrainz.model.ListenBrainzTrackMetadata
 import com.rc.axiom.extensions.media.displayArtistName
+import com.rc.axiom.extensions.media.extractMainArtistName
+import com.rc.axiom.data.remote.ytmusic.YtMusicService
+import com.rc.axiom.data.remote.genius.GeniusService
 import com.rc.axiom.util.CryptoUtil
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import com.rc.axiom.data.local.repository.SongRepository
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import kotlin.io.encoding.Base64
@@ -69,7 +77,11 @@ class NetworkRepositoryImpl(
     private val musicBrainzService: MusicBrainzService,
     private val wikipediaService: WikipediaService,
     private val spotifyService: SpotifyService,
-    private val audioDbService: AudioDbService
+    private val audioDbService: AudioDbService,
+    private val ytMusicService: YtMusicService,
+    private val geniusService: GeniusService,
+    private val lastFmService: LastFmService,
+    private val songRepository: SongRepository
 ) : NetworkRepository {
 
     private val lastFmLoginStateFlow = MutableStateFlow<LoginState>(LoginState.Empty)
@@ -81,11 +93,25 @@ class NetworkRepositoryImpl(
     private val appName = context.getString(R.string.app_name)
 
     private fun getCachedValue(key: String): String? {
+        val ttlKey = "net_cache_ttl_$key"
+        val expiryMs = preferences.getLong(ttlKey, 0L)
+        if (System.currentTimeMillis() > expiryMs) {
+            // Cache expired — evict stale entry
+            preferences.edit()
+                .remove("net_cache_$key")
+                .remove(ttlKey)
+                .apply()
+            return null
+        }
         return preferences.getString("net_cache_$key", null)
     }
 
     private fun setCachedValue(key: String, value: String) {
-        preferences.edit().putString("net_cache_$key", value).apply()
+        val expiryMs = System.currentTimeMillis() + CACHE_TTL_MS
+        preferences.edit()
+            .putString("net_cache_$key", value)
+            .putLong("net_cache_ttl_$key", expiryMs)
+            .apply()
     }
 
     override fun clearArtistCache(name: String) {
@@ -151,11 +177,9 @@ class NetworkRepositoryImpl(
         song: Song,
         timestamp: Long
     ): ScrobblingResult {
-        if (service == ScrobblingService.Lastfm) {
-            return ScrobblingResult.Failure("Last.fm is disabled")
-        }
+        // Note: Lastfm scrobbling is currently disabled. The branch is kept for future re-enablement.
         return when (service) {
-            ScrobblingService.Lastfm -> scrobbleToLastfm(song, timestamp)
+            ScrobblingService.Lastfm -> ScrobblingResult.Failure("Last.fm is disabled")
             ScrobblingService.ListenBrainz -> scrobbleToListenBrainz(song, timestamp)
         }
     }
@@ -164,11 +188,9 @@ class NetworkRepositoryImpl(
         service: ScrobblingService,
         song: Song
     ): ScrobblingResult {
-        if (service == ScrobblingService.Lastfm) {
-            return ScrobblingResult.Failure("Last.fm is disabled")
-        }
+        // Note: Lastfm is currently disabled. Branch kept for future re-enablement.
         return when (service) {
-            ScrobblingService.Lastfm -> updateNowPlayingOnLastfm(song)
+            ScrobblingService.Lastfm -> ScrobblingResult.Failure("Last.fm is disabled")
             ScrobblingService.ListenBrainz -> updateNowPlayingOnListenBrainz(song)
         }
     }
@@ -197,8 +219,51 @@ class NetworkRepositoryImpl(
             )
         }
 
+        val cleanName = name.extractMainArtistName()
+        val resolved = resolveArtistEntity(name, songTitles, albumTitles)
+        val finalBio = resolved?.biography
+        val geniusImageUrl = resolved?.imageUrl
+        val lastFmArtist = resolved?.lastFmArtist
+
+        if (finalBio != null) {
+            setCachedValue(cacheKey, finalBio)
+            if (geniusImageUrl != null) {
+                setCachedValue("artist_img_${name.lowercase()}", geniusImageUrl)
+            }
+            return LastFmArtist(
+                artist = LastFmArtist.Artist(
+                    bio = LastFmArtist.Bio(
+                        content = finalBio
+                    )
+                ),
+                debutYear = lastFmArtist?.debutYear,
+                genre = lastFmArtist?.genre,
+                style = lastFmArtist?.style,
+                mood = lastFmArtist?.mood,
+                country = lastFmArtist?.country
+            )
+        }
+
+        if (NetworkFeature.Services.YtMusic.isAvailable) {
+            try {
+                val metadata = ytMusicService.scraper.scrapeArtistMetadata(cleanName)
+                if (metadata != null && !metadata.description.isNullOrEmpty()) {
+                    setCachedValue(cacheKey, metadata.description)
+                    return LastFmArtist(
+                        artist = LastFmArtist.Artist(
+                            bio = LastFmArtist.Bio(
+                                content = metadata.description
+                            )
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         if (NetworkFeature.Services.Wikipedia.isAvailable) {
-            val wikiBio = wikipediaService.getArtistBio(name, songTitles, albumTitles)
+            val wikiBio = wikipediaService.getArtistBio(cleanName, songTitles, albumTitles)
             if (!wikiBio.isNullOrEmpty()) {
                 setCachedValue(cacheKey, wikiBio)
                 return LastFmArtist(
@@ -212,7 +277,7 @@ class NetworkRepositoryImpl(
         }
 
         if (NetworkFeature.Services.AudioDb.isAvailable) {
-            val audioDbArtist = audioDbService.getArtistDetails(name)
+            val audioDbArtist = audioDbService.getArtistDetails(cleanName)
             val audioDbBio = audioDbArtist?.strBiographyEN
             if (!audioDbBio.isNullOrEmpty()) {
                 setCachedValue(cacheKey, audioDbBio)
@@ -238,7 +303,7 @@ class NetworkRepositoryImpl(
         }
 
         if (NetworkFeature.Services.MusicBrainz.isAvailable) {
-            val mbBio = musicBrainzService.getArtistInfo(name)
+            val mbBio = musicBrainzService.getArtistInfo(cleanName)
             if (!mbBio.isNullOrEmpty()) {
                 setCachedValue(cacheKey, mbBio)
                 return LastFmArtist(
@@ -266,8 +331,69 @@ class NetworkRepositoryImpl(
             )
         }
 
+        val cleanArtist = artist.extractMainArtistName()
+        var geniusBio: String? = null
+        var coverUrl: String? = null
+
+        // 1. Fetch from Genius
+        if (NetworkFeature.Services.Genius.isAvailable) {
+            try {
+                val query = "$cleanArtist $album"
+                val hits = geniusService.searchSong(query)
+                val matchingSong = hits.firstOrNull {
+                    it.primaryArtist.name.contains(cleanArtist, ignoreCase = true) ||
+                            it.title.contains(album, ignoreCase = true)
+                }
+                if (matchingSong != null) {
+                    val songDetail = geniusService.getSongDetails(matchingSong.id)
+                    val albumId = songDetail?.album?.id
+                    if (albumId != null) {
+                        val albumDetail = geniusService.getAlbumDetails(albumId)
+                        geniusBio = albumDetail?.description?.plain
+                        coverUrl = albumDetail?.coverArtUrl
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        // 2. Fetch from Last.fm
+        var lastFmBio: String? = null
+        try {
+            val lastFmAlbum = lastFmService.albumInfo(album, cleanArtist, lang)
+            lastFmBio = lastFmAlbum.album?.wiki?.content
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // 3. Combine
+        val finalBio = when {
+            !geniusBio.isNullOrBlank() && !lastFmBio.isNullOrBlank() -> {
+                val cleanLastFmBio = lastFmBio.substringBefore("User-contributed text is available under")
+                "$geniusBio\n\n$cleanLastFmBio".trim()
+            }
+            !geniusBio.isNullOrBlank() -> geniusBio
+            !lastFmBio.isNullOrBlank() -> lastFmBio
+            else -> null
+        }
+
+        if (finalBio != null) {
+            setCachedValue(cacheKey, finalBio)
+            if (coverUrl != null) {
+                setCachedValue("album_img_${artist.lowercase()}_${album.lowercase()}", coverUrl)
+            }
+            return LastFmAlbum(
+                album = LastFmAlbum.Album(
+                    wiki = LastFmAlbum.Wiki(
+                        content = finalBio
+                    )
+                )
+            )
+        }
+
         if (NetworkFeature.Services.Wikipedia.isAvailable) {
-            val wikiBio = wikipediaService.getAlbumBio(artist, album)
+            val wikiBio = wikipediaService.getAlbumBio(cleanArtist, album)
             if (!wikiBio.isNullOrEmpty()) {
                 setCachedValue(cacheKey, wikiBio)
                 return LastFmAlbum(
@@ -312,6 +438,36 @@ class NetworkRepositoryImpl(
                     )
                 )
             )
+        }
+
+        if (NetworkFeature.Services.Genius.isAvailable) {
+            try {
+                val cleanArtist = artist.extractMainArtistName()
+                val query = "$cleanArtist $title"
+                val hits = geniusService.searchSong(query)
+                val matchingSong = hits.firstOrNull {
+                    it.primaryArtist.name.contains(cleanArtist, ignoreCase = true) ||
+                            it.title.contains(title, ignoreCase = true)
+                }
+                if (matchingSong != null && !matchingSong.songArtImageUrl.isNullOrEmpty()) {
+                    val imageUrl = matchingSong.songArtImageUrl
+                    setCachedValue(cacheKey, imageUrl)
+                    return DeezerTrack(
+                        data = listOf(
+                            DeezerTrack.TrackData(
+                                album = DeezerTrack.TrackData.Album(
+                                    image = imageUrl,
+                                    smallImage = imageUrl,
+                                    mediumImage = imageUrl,
+                                    largeImage = imageUrl
+                                )
+                            )
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         if (NetworkFeature.Services.MusicBrainz.isAvailable) {
@@ -364,8 +520,73 @@ class NetworkRepositoryImpl(
             )
         }
 
+        val cleanName = name.extractMainArtistName()
+        val resolved = resolveArtistEntity(name, songTitles, albumTitles)
+        val geniusImageUrl = resolved?.imageUrl
+        if (!geniusImageUrl.isNullOrEmpty()) {
+            setCachedValue(cacheKey, geniusImageUrl)
+            return DeezerArtist(
+                result = listOf(
+                    DeezerArtist.Result(
+                        artistName = name,
+                        image = geniusImageUrl,
+                        smallImage = geniusImageUrl,
+                        mediumImage = geniusImageUrl,
+                        largeImage = geniusImageUrl
+                    )
+                ),
+                total = 1
+            )
+        }
+
+        if (NetworkFeature.Services.YtMusic.isAvailable) {
+            try {
+                // 1. Scrape artist channel page for high-res profile photo
+                val metadata = ytMusicService.scraper.scrapeArtistMetadata(cleanName)
+                if (metadata != null && !metadata.imageUrl.isNullOrEmpty()) {
+                    setCachedValue(cacheKey, metadata.imageUrl)
+                    return DeezerArtist(
+                        result = listOf(
+                            DeezerArtist.Result(
+                                artistName = name,
+                                image = metadata.imageUrl,
+                                smallImage = metadata.imageUrl,
+                                mediumImage = metadata.imageUrl,
+                                largeImage = metadata.imageUrl
+                            )
+                        ),
+                        total = 1
+                    )
+                }
+                
+                // 2. Fallback to InnerTube search if scraper returns no image
+                val ytItems = ytMusicService.searchMusic(cleanName)
+                val matchingItem = ytItems.firstOrNull {
+                    it.imageUrl != null &&
+                            it.artist.contains(cleanName, ignoreCase = true)
+                }
+                if (matchingItem != null && matchingItem.imageUrl != null) {
+                    setCachedValue(cacheKey, matchingItem.imageUrl)
+                    return DeezerArtist(
+                        result = listOf(
+                            DeezerArtist.Result(
+                                artistName = name,
+                                image = matchingItem.imageUrl,
+                                smallImage = matchingItem.imageUrl,
+                                mediumImage = matchingItem.imageUrl,
+                                largeImage = matchingItem.imageUrl
+                            )
+                        ),
+                        total = 1
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         if (NetworkFeature.Services.Spotify.isAvailable) {
-            val spotifyUrl = spotifyService.getArtistImageUrl(name, songTitles, albumTitles)
+            val spotifyUrl = spotifyService.getArtistImageUrl(cleanName, songTitles, albumTitles)
             if (!spotifyUrl.isNullOrEmpty()) {
                 setCachedValue(cacheKey, spotifyUrl)
                 return DeezerArtist(
@@ -383,7 +604,7 @@ class NetworkRepositoryImpl(
             }
         }
         if (NetworkFeature.Services.AudioDb.isAvailable) {
-            val audioDbArtist = audioDbService.getArtistDetails(name)
+            val audioDbArtist = audioDbService.getArtistDetails(cleanName)
             val audioDbImg = audioDbArtist?.strArtistThumb
             if (!audioDbImg.isNullOrEmpty()) {
                 setCachedValue(cacheKey, audioDbImg)
@@ -402,7 +623,7 @@ class NetworkRepositoryImpl(
             }
         }
         if (NetworkFeature.Services.Wikipedia.isAvailable) {
-            val wikiUrl = wikipediaService.getArtistImageUrl(name, songTitles)
+            val wikiUrl = wikipediaService.getArtistImageUrl(cleanName, songTitles)
             if (!wikiUrl.isNullOrEmpty()) {
                 setCachedValue(cacheKey, wikiUrl)
                 return DeezerArtist(
@@ -420,7 +641,7 @@ class NetworkRepositoryImpl(
             }
         }
         return try {
-            deezerService.artist(name, limit, index)
+            deezerService.artist(cleanName, limit, index)
         } catch (e: Exception) {
             Log.e(TAG, "Deezer: artist info couldn't be retrieved!", e)
             null
@@ -442,6 +663,69 @@ class NetworkRepositoryImpl(
                     )
                 )
             )
+        }
+
+        val cleanArtist = artist.extractMainArtistName()
+        if (NetworkFeature.Services.Genius.isAvailable) {
+            try {
+                val query = "$cleanArtist $name"
+                val hits = geniusService.searchSong(query)
+                val matchingSong = hits.firstOrNull {
+                    it.primaryArtist.name.contains(cleanArtist, ignoreCase = true) ||
+                            it.title.contains(name, ignoreCase = true)
+                }
+                if (matchingSong != null) {
+                    val songDetail = geniusService.getSongDetails(matchingSong.id)
+                    val albumId = songDetail?.album?.id
+                    val coverUrl = if (albumId != null) {
+                        geniusService.getAlbumDetails(albumId)?.coverArtUrl
+                    } else {
+                        songDetail?.songArtImageUrl
+                    }
+                    if (!coverUrl.isNullOrEmpty()) {
+                        setCachedValue(cacheKey, coverUrl)
+                        return DeezerAlbum(
+                            data = listOf(
+                                DeezerAlbum.AlbumData(
+                                    title = name,
+                                    image = coverUrl,
+                                    smallImage = coverUrl,
+                                    mediumImage = coverUrl,
+                                    largeImage = coverUrl
+                                )
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        if (NetworkFeature.Services.YtMusic.isAvailable) {
+            try {
+                val ytItems = ytMusicService.searchMusic("$cleanArtist $name")
+                val matchingItem = ytItems.firstOrNull {
+                    it.imageUrl != null &&
+                            (it.artist.contains(cleanArtist, ignoreCase = true) || it.title.contains(name, ignoreCase = true))
+                }
+                if (matchingItem != null && matchingItem.imageUrl != null) {
+                    setCachedValue(cacheKey, matchingItem.imageUrl)
+                    return DeezerAlbum(
+                        data = listOf(
+                            DeezerAlbum.AlbumData(
+                                title = name,
+                                image = matchingItem.imageUrl,
+                                smallImage = matchingItem.imageUrl,
+                                mediumImage = matchingItem.imageUrl,
+                                largeImage = matchingItem.imageUrl
+                            )
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         if (NetworkFeature.Services.MusicBrainz.isAvailable) {
@@ -723,10 +1007,203 @@ class NetworkRepositoryImpl(
         val url = "https://listenbrainz.org/user/$user/"
     }
 
+    private suspend fun resolveArtistEntity(
+        localArtistName: String,
+        passedSongTitles: List<String>,
+        passedAlbumTitles: List<String>
+    ): ResolvedArtistProfile? = coroutineScope {
+        val cleanName = localArtistName.extractMainArtistName()
+        
+        // Step 1: Extract local profile / fingerprint
+        val localSongs = try {
+            songRepository.songs().filter {
+                it.artistName.contains(cleanName, ignoreCase = true) ||
+                cleanName.contains(it.artistName, ignoreCase = true)
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+
+        val localAlbums = (localSongs.map { it.albumName } + passedAlbumTitles).filter { it.isNotBlank() }.distinct()
+        val localTracks = (localSongs.map { it.title } + passedSongTitles).filter { it.isNotBlank() }.distinct()
+        val years = localSongs.map { it.year }.filter { it > 0 }
+        val minYear = years.minOrNull() ?: 1900
+        val maxYear = years.maxOrNull() ?: 2026
+
+        // Step 2: Query MusicBrainz for candidate profiles
+        var bestMbid: String? = null
+        try {
+            val candidates = musicBrainzService.searchArtists(cleanName)
+            
+            // Query candidate release groups concurrently to prevent sequential RTT delays
+            val candidateScores = candidates.map { candidate ->
+                async(Dispatchers.IO) {
+                    try {
+                        val beginYearStr = candidate.lifeSpan?.begin?.take(4)?.toIntOrNull()
+                        val endYearStr = candidate.lifeSpan?.end?.take(4)?.toIntOrNull()
+                        
+                        if (beginYearStr != null && maxYear < beginYearStr) {
+                            return@async Pair(candidate.id, 0.0)
+                        }
+                        if (endYearStr != null && minYear > endYearStr) {
+                            return@async Pair(candidate.id, 0.0)
+                        }
+
+                        val releaseGroups = musicBrainzService.getReleaseGroups(candidate.id)
+                        val remoteAlbums = releaseGroups.map { it.title }
+                        val score = calculateJaccardSimilarity(localAlbums, remoteAlbums)
+                        Pair(candidate.id, score)
+                    } catch (e: Exception) {
+                        Pair(candidate.id, 0.0)
+                    }
+                }
+            }.awaitAll()
+
+            val bestCandidate = candidateScores.maxByOrNull { it.second }
+            if (bestCandidate != null && bestCandidate.second >= 0.65) {
+                bestMbid = bestCandidate.first
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val finalMbid = bestMbid
+
+        // Step 3: Run Last.fm, Wikipedia/Wikidata, and Genius pipelines concurrently
+        val lastFmDeferred = async(Dispatchers.IO) {
+            var lastFmBio: String? = null
+            var lastFmArtist: com.rc.axiom.data.remote.lastfm.model.LastFmArtist? = null
+            if (!finalMbid.isNullOrBlank()) {
+                try {
+                    val fetchedArtist = lastFmService.artistInfo(null, null, null, mbid = finalMbid)
+                    lastFmArtist = fetchedArtist
+                    lastFmBio = fetchedArtist.artist?.bio?.content
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            if (lastFmBio.isNullOrBlank()) {
+                try {
+                    val lastFmResult = lastFmService.artistInfo(cleanName, null, null)
+                    val bio = lastFmResult.artist?.bio?.content
+                    if (!bio.isNullOrBlank()) {
+                        lastFmArtist = lastFmResult
+                        lastFmBio = bio
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            Pair(lastFmArtist, lastFmBio)
+        }
+
+        val wikipediaDeferred = async(Dispatchers.IO) {
+            var wikipediaBio: String? = null
+            var wikipediaImageUrl: String? = null
+            if (!finalMbid.isNullOrBlank()) {
+                try {
+                    val qid = musicBrainzService.getWikidataQid(finalMbid)
+                    if (!qid.isNullOrBlank()) {
+                        val pageTitle = wikipediaService.getWikipediaTitle(qid)
+                        if (!pageTitle.isNullOrBlank()) {
+                            wikipediaBio = wikipediaService.getArtistBioByTitle(pageTitle)
+                            wikipediaImageUrl = wikipediaService.getArtistImageUrlByTitle(pageTitle)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            if (wikipediaBio.isNullOrBlank() && NetworkFeature.Services.Wikipedia.isAvailable) {
+                try {
+                    wikipediaBio = wikipediaService.getArtistBio(cleanName, localTracks, localAlbums)
+                    wikipediaImageUrl = wikipediaService.getArtistImageUrl(cleanName, localTracks, localAlbums)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            Pair(wikipediaBio, wikipediaImageUrl)
+        }
+
+        val geniusDeferred = async(Dispatchers.IO) {
+            var geniusBio: String? = null
+            var geniusImageUrl: String? = null
+            if (NetworkFeature.Services.Genius.isAvailable) {
+                try {
+                    val distinctTrack = localTracks.firstOrNull { it.length > 3 } ?: ""
+                    val query = if (distinctTrack.isNotBlank()) "$cleanName $distinctTrack" else cleanName
+                    val hits = geniusService.searchSong(query)
+                    val firstHit = hits.firstOrNull { hit ->
+                        hit.primaryArtist.name.contains(cleanName, ignoreCase = true) ||
+                        cleanName.contains(hit.primaryArtist.name, ignoreCase = true)
+                    }
+                    if (firstHit != null) {
+                        val geniusArtistId = firstHit.primaryArtist.id
+                        val remoteSongs = geniusService.getArtistSongs(geniusArtistId)
+                        val matchCount = remoteSongs.count { song ->
+                            localTracks.any { localTrack ->
+                                song.title.equals(localTrack, ignoreCase = true) ||
+                                song.title.contains(localTrack, ignoreCase = true)
+                            }
+                        }
+                        if (matchCount > 0 || localTracks.isEmpty()) {
+                            val detail = geniusService.getArtistDetails(geniusArtistId)
+                            geniusBio = detail?.description?.plain
+                            geniusImageUrl = detail?.imageUrl ?: firstHit.primaryArtist.imageUrl
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            Pair(geniusBio, geniusImageUrl)
+        }
+
+        val lastFmResult = lastFmDeferred.await()
+        val wikipediaResult = wikipediaDeferred.await()
+        val geniusResult = geniusDeferred.await()
+
+        ResolvedArtistProfile(
+            biography = combineBiographies(geniusResult.first, lastFmResult.second, wikipediaResult.first),
+            imageUrl = wikipediaResult.second ?: geniusResult.second,
+            mbid = finalMbid,
+            lastFmArtist = lastFmResult.first
+        )
+    }
+
+    private data class ResolvedArtistProfile(
+        val biography: String?,
+        val imageUrl: String?,
+        val mbid: String?,
+        val lastFmArtist: com.rc.axiom.data.remote.lastfm.model.LastFmArtist?
+    )
+
+    private fun calculateJaccardSimilarity(list1: List<String>, list2: List<String>): Double {
+        if (list1.isEmpty() || list2.isEmpty()) return 0.0
+        val set1 = list1.map { it.lowercase().trim() }.toSet()
+        val set2 = list2.map { it.lowercase().trim() }.toSet()
+        val intersection = set1.intersect(set2).size
+        val union = (set1 + set2).size
+        return intersection.toDouble() / union.toDouble()
+    }
+
+    private fun combineBiographies(geniusBio: String?, lastFmBio: String?, wikipediaBio: String?): String? {
+        val cleanLastFmBio = lastFmBio?.substringBefore("User-contributed text is available under")?.trim()
+        val list = listOfNotNull(
+            wikipediaBio?.takeIf { it.isNotBlank() },
+            geniusBio?.takeIf { it.isNotBlank() },
+            cleanLastFmBio?.takeIf { it.isNotBlank() }
+        )
+        return if (list.isNotEmpty()) list.joinToString("\n\n") else null
+    }
+
     companion object {
         private const val TAG = "NetworkRepository"
 
         private const val LAST_FM_SESSION_INFO = "lastfm_session"
         private const val LISTEN_BRAINZ_SESSION_INFO = "listenbrainz_session"
+
+        /** Cache entries expire after 7 days to prevent stale artist bios/images */
+        private const val CACHE_TTL_MS = 7L * 24 * 60 * 60 * 1000L
     }
 }

@@ -21,7 +21,7 @@ class ListenBrainzService(private val client: HttpClient) {
     suspend fun validateToken(token: String): ListenBrainzTokenValidationResponse {
         return client.get("${LISTENBRAINZ_API_URL}validate-token") {
             userAgent(USER_AGENT)
-            header("Authorization", "Token $token")
+            parameter("token", token)
         }.body()
     }
 

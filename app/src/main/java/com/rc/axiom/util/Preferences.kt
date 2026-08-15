@@ -103,7 +103,7 @@ object Preferences : KoinComponent {
         get() = false // Force Material You always off
 
     val isCustomFont: Boolean
-        get() = preferences.getBoolean(USE_CUSTOM_FONT, true)
+        get() = false
 
     val appBarMode: TopAppBarLayout.AppBarMode
         get() = when (preferences.requireString(APPBAR_MODE, AppBarMode.COMPACT)) {
@@ -161,8 +161,8 @@ object Preferences : KoinComponent {
         set(value) = preferences.edit { putBoolean(COMPACT_ARTIST_SONG_VIEW, value) }
 
     var nowPlayingScreen: NowPlayingScreen
-        get() = preferences.enumValue(NOW_PLAYING_SCREEN, NowPlayingScreen.Default)
-        set(value) = preferences.edit { putString(NOW_PLAYING_SCREEN, value.name) }
+        get() = NowPlayingScreen.Reels
+        set(value) {}
 
     val extraControls: Boolean
         get() = preferences.getBoolean(ADD_EXTRA_CONTROLS, false)

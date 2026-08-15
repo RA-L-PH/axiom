@@ -87,7 +87,8 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:insetLeft="0dp"
-                android:insetRight="0dp" />
+                android:insetRight="0dp"
+                android:visibility="gone" />
 
         </com.rc.axiom.ui.component.views.WidthFitSquareLayout>
 

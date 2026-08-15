@@ -44,13 +44,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="8dp">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/wikiTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
+                android:paddingBottom="6dp"
                 android:textAppearance="?textAppearanceTitleMedium"
                 android:textColor="#D71921"
                 android:fontFamily="@font/ndot57"
@@ -69,16 +69,14 @@
                 android:fontFamily="@font/letteramonoll"
                 tools:text="@tools:sample/lorem/random" />
 
-            <com.google.android.material.textview.MaterialTextView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/wikiChevron"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="8dp"
-                android:text="∨"
-                android:textColor="#D71921"
-                android:fontFamily="@font/ndot57"
-                android:textSize="20sp"
+                app:srcCompat="@drawable/ic_keyboard_arrow_down_24dp"
+                app:tint="#D71921"
                 android:clickable="true"
                 android:focusable="true" />
 

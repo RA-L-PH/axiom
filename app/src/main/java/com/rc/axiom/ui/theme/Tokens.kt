@@ -7,7 +7,7 @@ object SurfaceColorTokens {
 }
 
 object SliderTokens {
-    val TrackCornerSize = 12.dp
+    val TrackCornerSize = 0.dp
     val ThumbTrackGapSize = 6.dp
     val MediumTrackHeight = 32.dp
     val LargeTrackHeight = 40.dp
