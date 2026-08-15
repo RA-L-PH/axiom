@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX } from 'react-icons/fi';
+import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const baseUrl = 'https://raw.githubusercontent.com/RA-L-PH/axiom/master/assets';
 
@@ -22,6 +22,15 @@ const screenshots = [
 
 export default function Screenshots() {
   const [selected, setSelected] = useState<number | null>(null);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  const nextSlide = () => {
+    setCarouselIndex((prev) => (prev === screenshots.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevSlide = () => {
+    setCarouselIndex((prev) => (prev === 0 ? screenshots.length - 1 : prev - 1));
+  };
 
   return (
     <section id="screenshots" className="py-24 px-6 bg-axiom-gray">
@@ -43,7 +52,8 @@ export default function Screenshots() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {/* Desktop View - Grid */}
+        <div className="hidden md:grid md:grid-cols-4 gap-4">
           {screenshots.map((s, i) => (
             <motion.div
               key={s.label}
@@ -64,6 +74,59 @@ export default function Screenshots() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Mobile View - Carousel */}
+        <div className="md:hidden flex flex-col items-center">
+          <div className="relative w-full max-w-[280px] aspect-[9/16] bg-axiom-black border border-axiom-border overflow-hidden group">
+            {/* Click to open Lightbox */}
+            <div 
+              className="w-full h-full cursor-pointer"
+              onClick={() => setSelected(carouselIndex)}
+            >
+              <img
+                src={`${baseUrl}/${screenshots[carouselIndex].file}`}
+                alt={screenshots[carouselIndex].label}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Left Button */}
+            <button
+              onClick={prevSlide}
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-axiom-black/80 border border-axiom-border text-axiom-white hover:border-axiom-red hover:text-axiom-red transition-colors rounded-none cursor-pointer"
+            >
+              <FiChevronLeft size={16} />
+            </button>
+
+            {/* Right Button */}
+            <button
+              onClick={nextSlide}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-axiom-black/80 border border-axiom-border text-axiom-white hover:border-axiom-red hover:text-axiom-red transition-colors rounded-none cursor-pointer"
+            >
+              <FiChevronRight size={16} />
+            </button>
+
+            {/* Label Overlay */}
+            <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
+              <span className="bg-axiom-black/80 border border-axiom-border px-3 py-1 font-ndot text-[10px] tracking-wider uppercase text-axiom-white">
+                {screenshots[carouselIndex].label}
+              </span>
+            </div>
+          </div>
+
+          {/* Dots Indicator */}
+          <div className="flex gap-1.5 mt-6 max-w-full overflow-x-auto py-2 scrollbar-none px-4 justify-center">
+            {screenshots.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCarouselIndex(idx)}
+                className={`w-1.5 h-1.5 transition-colors cursor-pointer ${
+                  idx === carouselIndex ? 'bg-axiom-red' : 'bg-axiom-border hover:bg-axiom-gray-muted'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { FiGithub, FiHeart, FiExternalLink } from 'react-icons/fi';
+import { FiGithub, FiExternalLink } from 'react-icons/fi';
 
 const links = [
   {
@@ -6,8 +6,6 @@ const links = [
     items: [
       { label: 'Source Code', href: 'https://github.com/RA-L-PH/axiom' },
       { label: 'Releases', href: 'https://github.com/RA-L-PH/axiom/releases' },
-      { label: 'Issues', href: 'https://github.com/RA-L-PH/axiom/issues' },
-      { label: 'Wiki', href: 'https://github.com/RA-L-PH/axiom/wiki' },
     ],
   },
   {
@@ -15,16 +13,12 @@ const links = [
     items: [
       { label: 'Telegram', href: 'https://t.me/rcdev' },
       { label: 'Contributing', href: 'https://github.com/RA-L-PH/axiom/blob/master/CONTRIBUTING.md' },
-      { label: 'Translations', href: 'https://hosted.weblate.org/projects/axiom-music/' },
-      { label: 'Code of Conduct', href: 'https://github.com/RA-L-PH/axiom/blob/master/CODE_OF_CONDUCT.md' },
     ],
   },
   {
     group: 'Credits',
     items: [
-      { label: 'BoomingMusic', href: 'https://github.com/mardous/BoomingMusic' },
       { label: 'Retro Music Player', href: 'https://github.com/RetroMusicPlayer/RetroMusicPlayer' },
-      { label: 'LRCLib', href: 'https://lrclib.net/' },
       { label: 'License (GPL-3.0)', href: 'https://github.com/RA-L-PH/axiom/blob/master/LICENSE.txt' },
     ],
   },
@@ -88,12 +82,9 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="py-6 border-t border-axiom-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-ntype-mono text-[10px] tracking-[0.15em] text-axiom-gray-muted">
+        <div className="py-6 border-t border-axiom-border flex flex-col sm:flex-row items-center justify-center gap-4">
+          <p className="font-ntype-mono text-[10px] tracking-[0.15em] text-axiom-gray-muted text-center">
             &copy; 2026 RA-L-PH. Licensed under GPL-3.0.
-          </p>
-          <p className="font-ntype-mono text-[10px] tracking-[0.15em] text-axiom-gray-muted flex items-center gap-1.5">
-            Built with <FiHeart size={10} className="text-axiom-red" /> and Kotlin
           </p>
         </div>
       </div>

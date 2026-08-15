@@ -112,12 +112,13 @@ export default function Features() {
           </p>
         </div>
 
+        {/* Desktop View */}
         <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-axiom-border"
+          className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-axiom-border"
         >
           {features.map((f) => (
             <motion.div
@@ -140,6 +141,35 @@ export default function Features() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Mobile View - Movable Cards */}
+        <div className="flex sm:hidden overflow-x-auto snap-x snap-mandatory gap-4 pb-6 scrollbar-none">
+          {features.map((f, idx) => (
+            <div
+              key={f.title}
+              className="min-w-[80vw] snap-center bg-axiom-gray/40 border border-axiom-border p-6 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <f.icon
+                    size={18}
+                    className="text-axiom-red"
+                  />
+                  <h4 className="font-ndot text-sm tracking-wider uppercase text-axiom-white">
+                    {f.title}
+                  </h4>
+                </div>
+                <p className="text-sm text-axiom-gray-muted leading-relaxed font-space">
+                  {f.desc}
+                </p>
+              </div>
+              <div className="mt-6 flex items-center justify-between border-t border-axiom-border/50 pt-4 text-[10px] font-ntype-mono text-axiom-gray-muted uppercase tracking-widest">
+                <span>Feature</span>
+                <span>{String(idx + 1).padStart(2, '0')} / {String(features.length).padStart(2, '0')}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
