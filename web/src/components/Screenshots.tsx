@@ -107,12 +107,7 @@ export default function Screenshots() {
               <FiChevronRight size={16} />
             </button>
 
-            {/* Label Overlay */}
-            <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
-              <span className="bg-axiom-black/80 border border-axiom-border px-3 py-1 font-ndot text-[10px] tracking-wider uppercase text-axiom-white">
-                {screenshots[carouselIndex].label}
-              </span>
-            </div>
+
           </div>
 
           {/* Dots Indicator */}
