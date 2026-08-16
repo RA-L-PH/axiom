@@ -1,4 +1,3 @@
-import { FiGithub, FiExternalLink } from 'react-icons/fi';
 
 const links = [
   {
@@ -9,9 +8,15 @@ const links = [
     ],
   },
   {
+    group: 'Developer',
+    items: [
+      { label: 'GitHub', href: 'https://github.com/RA-L-PH' },
+      { label: 'Portfolio', href: 'https://ra-l-ph.pages.dev' },
+    ],
+  },
+  {
     group: 'Community',
     items: [
-      { label: 'Telegram', href: 'https://t.me/rcdev' },
       { label: 'Contributing', href: 'https://github.com/RA-L-PH/axiom/blob/master/CONTRIBUTING.md' },
     ],
   },
@@ -28,7 +33,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-axiom-border">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="py-16 grid grid-cols-2 md:grid-cols-4 gap-12">
+        <div className="py-16 grid grid-cols-2 md:grid-cols-5 gap-12">
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <img src="./axiom-logo.png" alt="axiom." className="w-7 h-7 object-contain" />
@@ -39,24 +44,6 @@ export default function Footer() {
             <p className="text-sm text-axiom-gray-muted leading-relaxed font-space">
               Modern design. Pure sound. Fully yours.
             </p>
-            <div className="mt-4 flex items-center gap-3">
-              <a
-                href="https://github.com/RA-L-PH/axiom"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 border border-axiom-border text-axiom-gray-muted hover:text-axiom-white hover:border-axiom-white transition-colors"
-              >
-                <FiGithub size={14} />
-              </a>
-              <a
-                href="https://t.me/rcdev"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 border border-axiom-border text-axiom-gray-muted hover:text-axiom-red hover:border-axiom-red transition-colors"
-              >
-                <FiExternalLink size={14} />
-              </a>
-            </div>
           </div>
 
           {links.map((group) => (

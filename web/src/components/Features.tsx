@@ -124,12 +124,13 @@ export default function Features() {
             <motion.div
               key={f.title}
               variants={item}
-              className="group bg-axiom-black p-8 hover:bg-axiom-gray transition-colors"
+              className="group bg-axiom-black p-8 hover:bg-axiom-gray/60 transition-all duration-300 relative overflow-hidden cursor-default"
             >
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-axiom-red scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
               <div className="flex items-center gap-3 mb-4">
                 <f.icon
                   size={18}
-                  className="text-axiom-red group-hover:scale-110 transition-transform"
+                  className="text-axiom-red group-hover:scale-110 transition-transform duration-300"
                 />
                 <h4 className="font-ndot text-sm tracking-wider uppercase text-axiom-white">
                   {f.title}

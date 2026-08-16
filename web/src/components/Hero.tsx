@@ -11,15 +11,17 @@ export default function Hero() {
 
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-axiom-red to-transparent" />
 
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-axiom-red/10 rounded-full blur-[120px] pointer-events-none z-0" />
+
       {/* Main content - centered */}
-      <div className="flex-1 flex flex-col items-center justify-center">
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="relative z-10 flex flex-col items-center text-center max-w-4xl"
         >
-          <div className="mb-6 px-4 py-1.5 border border-axiom-border font-mono text-[10px] tracking-[0.3em] uppercase text-axiom-gray-muted">
+          <div className="mb-6 px-4 py-1.5 border border-axiom-border font-mono text-[10px] tracking-[0.3em] uppercase text-axiom-gray-muted bg-axiom-black/50 backdrop-blur-sm">
             v0.1.2-beta.2
           </div>
 
@@ -27,8 +29,9 @@ export default function Hero() {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
+            className="hover:scale-105 transition-transform duration-500 cursor-pointer"
           >
-            <img src="./axiom-logo.png" alt="axiom." className="w-24 h-24 object-contain" />
+            <img src="./axiom-logo.png" alt="axiom." className="w-24 h-24 object-contain filter drop-shadow-[0_0_15px_rgba(215,25,33,0.2)]" />
           </motion.div>
 
           <h1 className="mt-6 text-6xl md:text-8xl font-ndot tracking-tight text-axiom-white">
@@ -48,7 +51,7 @@ export default function Hero() {
               href="https://github.com/RA-L-PH/axiom/releases/latest"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3 px-8 py-4 bg-axiom-red text-axiom-white font-ndot text-sm tracking-widest uppercase hover:bg-axiom-red-dark transition-all"
+              className="group flex items-center gap-3 px-8 py-4 bg-axiom-red text-axiom-white font-ndot text-sm tracking-widest uppercase hover:bg-axiom-red-dark hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(215,25,33,0.35)] transition-all duration-300"
             >
               Download
               <span className="inline-block w-4 h-px bg-axiom-white group-hover:w-6 transition-all" />
@@ -57,7 +60,7 @@ export default function Hero() {
               href="https://github.com/RA-L-PH/axiom"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 px-8 py-4 border border-axiom-border text-axiom-white font-ndot text-sm tracking-widest uppercase hover:border-axiom-white transition-colors"
+              className="flex items-center gap-3 px-8 py-4 border border-axiom-border text-axiom-white font-ndot text-sm tracking-widest uppercase hover:border-axiom-white hover:bg-white/5 hover:scale-[1.02] transition-all duration-300"
             >
               <FiGithub size={16} />
               Source Code
